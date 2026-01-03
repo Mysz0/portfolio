@@ -20,27 +20,43 @@ export default function App() {
   useLayoutEffect(() => {
     const root = document.documentElement;
     root.classList.toggle('dark', isDark);
+    root.style.colorScheme = isDark ? 'dark' : 'light';
     localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
 
-    const computedThemeColor =
+    const baseColor =
       getComputedStyle(root).getPropertyValue('--theme-safe-area').trim() ||
       (isDark ? '#0b1220' : '#f8fafc');
 
-    const getOrCreateMeta = (name) => {
-      const existing = document.querySelector(`meta[name="${name}"]`);
-      if (existing) return existing;
+    const setMetaColor = (color) => {
+      const head = document.head;
+      if (!head) return;
+      head.querySelectorAll('meta[name="theme-color"]').forEach((el) => el.remove());
       const meta = document.createElement('meta');
-      meta.setAttribute('name', name);
-      document.head.appendChild(meta);
-      return meta;
+      meta.setAttribute('name', 'theme-color');
+      meta.setAttribute('content', color);
+      head.appendChild(meta);
+
+      const statusBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+      if (statusBar) {
+        statusBar.setAttribute('content', isDark ? 'black-translucent' : 'default');
+      }
     };
 
-    // Keep browser and iOS safe area/status bars in sync with the chosen theme before paint.
-    getOrCreateMeta('theme-color').setAttribute('content', computedThemeColor);
-    getOrCreateMeta('apple-mobile-web-app-status-bar-style').setAttribute(
-      'content',
-      isDark ? 'black-translucent' : 'default'
-    );
+    // Immediate paint-safe color for Safari/iOS UI chrome
+    document.documentElement.style.backgroundColor = baseColor;
+    document.body.style.backgroundColor = baseColor;
+    setMetaColor(baseColor);
+
+    // Second pass after CSS vars settle (Safari needs this)
+    requestAnimationFrame(() => {
+      const cssColor =
+        getComputedStyle(root).getPropertyValue('--theme-safe-area').trim() || baseColor;
+      document.documentElement.style.backgroundColor = cssColor;
+      document.body.style.backgroundColor = cssColor;
+      setMetaColor(cssColor);
+      // force repaint hint
+      void document.body.offsetHeight;
+    });
   }, [isDark]);
 
   useEffect(() => {

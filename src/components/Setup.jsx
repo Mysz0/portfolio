@@ -122,6 +122,13 @@ export default function Setup() {
     return () => obs.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (inView) {
+      setProgress(1)
+      setTabTween(1)
+    }
+  }, [inView])
+
   // simple tween on tab change to animate content entrance
   useEffect(() => {
     let raf

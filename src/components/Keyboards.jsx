@@ -75,6 +75,12 @@ export default function Keyboards() {
 		return () => obs.disconnect()
 	}, [])
 
+	useEffect(() => {
+		if (inView) {
+			setProgress(1)
+		}
+	}, [inView])
+
 	return (
 		<section
 			id="keyboards"

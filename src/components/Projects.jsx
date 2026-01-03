@@ -117,6 +117,13 @@ export default function Projects() {
     return () => obs.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (inView) {
+      setProgress(1)
+      setTabTween(1)
+    }
+  }, [inView])
+
   const spring = (value, factor = 1) => value * factor
 
   // lightweight tween to drive tab content entrance
