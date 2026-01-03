@@ -1,23 +1,179 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { Github, Sparkles, LayoutGrid, Wrench, Archive } from 'lucide-react'
 
-const sampleProjects = [
-  { id: 1, title: 'Project One', desc: 'Short description of project one.' },
-  { id: 2, title: 'Project Two', desc: 'Short description of project two.' },
-  { id: 3, title: 'Project Three', desc: 'Short description of project three.' }
+const tabs = [
+  {
+    id: 'featured',
+    label: 'Featured Builds',
+    icon: Sparkles,
+    items: [
+      {
+        title: 'Urban Radar',
+        desc: 'Location-based social app with a full theme engine (Emerald, Winter, Sakura, Aurora, Blackhole) and glass-morphism UI.',
+        tech: ['React 19', 'Vite', 'Tailwind', 'Theme Engine'],
+        link: 'https://github.com/Mysz0/urbanradar',
+        year: '2025/2026',
+        color: '#10b981'
+      },
+      {
+        title: 'Orzechowce Sanctuary',
+        desc: 'Adoption platform with admin tools, Supabase backend, responsive cards, and smooth filters for pets.',
+        tech: ['Next.js 14', 'TypeScript', 'Supabase', 'Tailwind'],
+        link: 'https://github.com/Mysz0/Orzechowce',
+        year: '2026',
+        color: '#f97316'
+      }
+    ]
+  },
+  {
+    id: 'tools',
+    label: 'Utilities',
+    icon: Wrench,
+    items: [
+      {
+        title: 'QR Code Generator',
+        desc: 'Real-time QR generation with Firebase auth, stored codes, and animated particles on the canvas.',
+        tech: ['Firebase', 'Firestore', 'Vanilla JS'],
+        link: 'https://github.com/Mysz0/qrcode_generator',
+        year: '2024',
+        color: '#8b5cf6'
+      }
+    ]
+  },
+  {
+    id: 'legacy',
+    label: 'Legacy / Offline',
+    icon: Archive,
+    items: [
+      {
+        title: 'Minecraft Blocks Recipes',
+        desc: 'Searchable recipes site for Minecraft items using MariaDB + vanilla HTML/CSS UI (Aug–Nov 2024).',
+        tech: ['MariaDB', 'HTML', 'CSS'],
+        link: '#',
+        year: '2024',
+        color: '#22c55e'
+      },
+      {
+        title: 'Send Files',
+        desc: 'Upload files and share a download URL. Static front-end; backend service formerly generated short links.',
+        tech: ['HTML', 'CSS'],
+        link: '#',
+        year: '2024',
+        color: '#f59e0b'
+      }
+    ]
+  }
 ]
 
 export default function Projects() {
+  const [active, setActive] = useState('featured')
+  const activeTab = tabs.find(t => t.id === active) ?? tabs[0]
+
   return (
-    <section id="projects" className="py-12">
-      <h2 className="text-2xl font-semibold mb-6">Selected Projects</h2>
-      <div className="grid gap-6 sm:grid-cols-2">
-        {sampleProjects.map(p => (
-          <article key={p.id} className="card p-6 rounded-lg">
-            <h3 className="font-semibold mb-2">{p.title}</h3>
-            <p className="text-slate-300">{p.desc}</p>
-            <div className="mt-4">
-              <a className="text-indigo-400 hover:underline" href="#">View</a>
+    <section id="projects" className="py-16 sm:py-20">
+      <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+        <h2 className="text-3xl sm:text-4xl font-black" style={{
+          backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+        }}>
+          Builds
+        </h2>
+        <div className="inline-flex items-center gap-2 px-3 py-2 smart-glass" style={{ borderRadius: '12px' }}>
+          <LayoutGrid size={16} style={{ color: 'rgb(var(--theme-primary))' }} />
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Modular & Themed</span>
+        </div>
+      </div>
+
+      <div className="inline-flex gap-2 mb-8 flex-wrap">
+        {tabs.map((tab) => {
+          const Icon = tab.icon
+          const isActive = tab.id === active
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActive(tab.id)}
+              className="px-4 py-2 smart-glass flex items-center gap-2 text-sm font-semibold transition-all"
+              style={{
+                borderRadius: '12px',
+                backgroundColor: isActive ? 'rgba(var(--theme-primary), 0.12)' : undefined,
+                borderColor: isActive ? 'rgba(var(--theme-primary), 0.35)' : undefined,
+                color: isActive ? 'rgb(var(--theme-primary))' : 'var(--theme-text-body)'
+              }}
+            >
+              <Icon size={14} />
+              {tab.label}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+        {activeTab.items.map((p, idx) => (
+          <article 
+            key={p.title} 
+            className="smart-glass p-6 sm:p-7 flex flex-col"
+            style={{
+              animation: `fadeInUp 0.7s ease-out ${0.05 + idx * 0.05}s backwards`,
+              borderRadius: '18px',
+              borderColor: `${p.color}33`
+            }}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div 
+                className="px-3 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{
+                  backgroundColor: `${p.color}1a`,
+                  color: p.color,
+                  boxShadow: `0 10px 28px -14px ${p.color}99`
+                }}
+              >
+                <span className="text-xs font-black whitespace-nowrap">{p.year}</span>
+              </div>
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--theme-text-muted)]">{activeTab.label}</span>
             </div>
+
+            <h3 className="text-xl font-black mb-2 text-[var(--theme-text-title)]" style={{ lineHeight: 1.2 }}>
+              {p.title}
+            </h3>
+            <p className="text-[var(--theme-text-muted)] mb-5 leading-relaxed">
+              {p.desc}
+            </p>
+
+            <div className="flex flex-wrap gap-2 mb-5">
+              {p.tech.map((t) => (
+                <span 
+                  key={t}
+                  className="text-xs font-semibold px-3 py-1"
+                  style={{
+                    backgroundColor: `${p.color}12`,
+                    color: p.color,
+                    borderRadius: '999px',
+                    border: `1px solid ${p.color}33`
+                  }}
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+
+            {p.link && p.link !== '#' ? (
+              <a 
+                href={p.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 font-black text-sm uppercase tracking-wider"
+                style={{ color: p.color }}
+              >
+                <Github size={16} />
+                View on GitHub
+              </a>
+            ) : (
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--theme-text-muted)]">
+                Offline / No repo
+              </span>
+            )}
           </article>
         ))}
       </div>
