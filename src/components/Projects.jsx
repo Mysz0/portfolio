@@ -192,13 +192,21 @@ export default function Projects() {
             return (
               <article 
                 key={p.title} 
-                className="smart-glass p-6 sm:p-7 flex flex-col"
+                className="smart-glass p-6 sm:p-7 flex flex-col card-accent"
                 style={{
-                  transform: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
+                  ['--card-transform']: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
                   opacity,
                   transition: 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
                   borderRadius: '18px',
-                  borderColor: `${p.color}33`
+                  borderColor: `${p.color}33`,
+                  background: 'var(--theme-card-bg)',
+                  backgroundImage: `linear-gradient(130deg, ${p.color}18, ${p.color}05 45%, transparent 70%)`,
+                  boxShadow: `0 12px 36px -18px ${p.color}77`,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  ['--card-shadow']: `${p.color}99`,
+                  ['--card-color']: p.color,
+                  ['--card-color-soft']: `${p.color}22`
                 }}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -244,14 +252,14 @@ export default function Projects() {
                     href={p.link} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 font-black text-sm uppercase tracking-wider"
+                    className="inline-flex items-center gap-2 font-black text-sm uppercase tracking-wider mt-auto pt-4 link-accent"
                     style={{ color: p.color }}
                   >
                     <Github size={16} />
                     View on GitHub
                   </a>
                 ) : (
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[var(--theme-text-muted)]">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[var(--theme-text-muted)] mt-auto pt-4">
                     Offline / No repo
                   </span>
                 )}

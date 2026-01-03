@@ -313,6 +313,54 @@ body {
   border-radius: 16px;
 }
 
+.card-accent {
+  position: relative;
+  overflow: hidden;
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1), filter 220ms ease, border-width 180ms ease;
+  will-change: transform, box-shadow, filter, border-width;
+  --card-color: rgb(var(--theme-primary));
+  --card-color-soft: rgba(var(--theme-primary), 0.14);
+  --card-shadow: rgba(0, 0, 0, 0.18);
+  --card-hover-scale: 1;
+  --card-border-width: 1px;
+  transform: var(--card-transform, none) scale(var(--card-hover-scale));
+  border-width: var(--card-border-width);
+}
+
+.card-accent::after {
+  content: '';
+  position: absolute;
+  inset: -28% -12% auto -12%;
+  height: 75%;
+  background: radial-gradient(circle at 22% 22%, var(--card-color-soft), transparent 45%),
+              linear-gradient(135deg, var(--card-color-soft), transparent 55%);
+  opacity: 0;
+  transition: opacity 200ms ease, transform 220ms ease;
+  pointer-events: none;
+}
+
+.card-accent:hover {
+  box-shadow: 0 18px 46px -18px var(--card-shadow, rgba(0, 0, 0, 0.18));
+  filter: brightness(1.02);
+  --card-hover-scale: 1.02;
+  --card-border-width: 2px;
+}
+
+.card-accent:hover::after {
+  opacity: 0;
+  transform: none;
+}
+
+.link-accent {
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.link-accent:hover {
+  border-color: currentColor;
+}
+
 .smart-glass:hover {
   background: var(--theme-card-hover);
   border-color: var(--theme-border-hover);

@@ -197,13 +197,19 @@ export default function Setup() {
               return (
                 <article
                   key={category.name}
-                  className="smart-glass p-6 sm:p-7 flex flex-col"
+                  className="smart-glass p-6 sm:p-7 flex flex-col card-accent"
                   style={{
-                    transform: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
+                    ['--card-transform']: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
                     opacity,
                     transition: 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
                     borderRadius: '18px',
-                    borderColor: `${category.color}33`
+                    borderColor: `${category.color}33`,
+                    background: 'var(--theme-card-bg)',
+                    backgroundImage: `linear-gradient(130deg, ${category.color}18, ${category.color}05 45%, transparent 70%)`,
+                    boxShadow: `0 12px 36px -18px ${category.color}77`,
+                    ['--card-shadow']: `${category.color}99`,
+                    ['--card-color']: category.color,
+                    ['--card-color-soft']: `${category.color}22`
                   }}
                 >
                   <div className="flex items-center gap-3 mb-6">

@@ -112,14 +112,19 @@ export default function Keyboards() {
 							return (
 								<article
 									key={kb.title}
-									className="smart-glass p-6 sm:p-7 flex flex-col"
+									className="smart-glass p-6 sm:p-7 flex flex-col card-accent"
 									style={{
-										transform: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
+										['--card-transform']: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
 										opacity,
 										transition: 'transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
 										borderRadius: '18px',
 										borderColor: `${kb.color}33`,
-										boxShadow: `0 12px 40px -16px ${kb.color}88`
+										background: 'var(--theme-card-bg)',
+										backgroundImage: `linear-gradient(130deg, ${kb.color}18, ${kb.color}05 45%, transparent 70%)`,
+										boxShadow: `0 12px 36px -18px ${kb.color}77`,
+										['--card-shadow']: `${kb.color}99`,
+										['--card-color']: kb.color,
+										['--card-color-soft']: `${kb.color}22`
 									}}
 								>
 									<div className="flex items-start justify-between mb-4">
