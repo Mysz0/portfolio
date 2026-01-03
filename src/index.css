@@ -133,6 +133,10 @@
 html, body {
   background: linear-gradient(135deg, #0a0e27 0%, #0f172a 50%, #1a1a2e 100%);
   position: relative;
+  background-color: var(--theme-safe-area);
+  overscroll-behavior: none;
+  max-width: 100%;
+  overflow-x: hidden;
   touch-action: pan-x pan-y;
 }
 
@@ -266,8 +270,10 @@ body::before {
   --theme-text-muted: #6b7280;
   
   --theme-map-bg: #f8fafc;
+  --theme-safe-area: #f8fafc;
   --trans-speed: 0.3s;
   --trans-timing: cubic-bezier(0.4, 0, 0.2, 1);
+  color-scheme: light;
 }
 
 .dark {
@@ -281,6 +287,8 @@ body::before {
   --theme-text-muted: #9ca3af;
   --theme-map-bg: #0a0a0a;
   --theme-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.5);
+  --theme-safe-area: #0b1220;
+  color-scheme: dark;
 }
 
 html, body, #root {

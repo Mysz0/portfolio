@@ -22,9 +22,9 @@ export default function App() {
     root.classList.toggle('dark', isDark);
     localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
 
-    const computedThemeColor = getComputedStyle(root)
-      .getPropertyValue('--theme-map-bg')
-      .trim() || (isDark ? '#0a0a0a' : '#f8fafc');
+    const computedThemeColor =
+      getComputedStyle(root).getPropertyValue('--theme-safe-area').trim() ||
+      (isDark ? '#0b1220' : '#f8fafc');
 
     const getOrCreateMeta = (name) => {
       const existing = document.querySelector(`meta[name="${name}"]`);
