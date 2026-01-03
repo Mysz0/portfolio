@@ -19,7 +19,7 @@ export default function Hero() {
             Myszo - I build bold, themeable interfaces.
           </h1>
           <p className="text-base sm:text-lg text-[var(--theme-text-body)] mb-8 leading-relaxed max-w-2xl">
-            React and Vue developer focused on dynamic theme systems, glass-morphism, and performance. Less fluff, more polish: sharp layouts, motion that guides, and code that ships.
+            React developer focused on dynamic theme systems, glass-morphism, and performance. Less fluff, more polish: sharp layouts, motion that guides, and code that ships.
           </p>
           <div className="flex items-center gap-3 flex-wrap">
             <a href="#projects" className="px-6 py-3 smart-glass font-semibold text-white" style={{
