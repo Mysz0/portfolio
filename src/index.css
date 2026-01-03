@@ -50,6 +50,89 @@
   }
 }
 
+/* Scrollable section panels to keep the page tight on desktop */
+.section-panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.section-panel-content {
+  max-height: 640px;
+  overflow-y: auto;
+  padding-right: 2px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.98) 85%, rgba(0,0,0,0) 100%);
+  transition: mask-image 200ms ease;
+}
+
+.section-panel:hover .section-panel-content {
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.98) 100%);
+}
+
+.section-panel-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.section-panel-content::-webkit-scrollbar-thumb {
+  background: rgba(var(--theme-primary), 0.35);
+  border-radius: 999px;
+}
+
+.section-panel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (max-width: 1024px) {
+  .section-panel {
+    overflow: visible;
+  }
+  .section-panel-content {
+    max-height: none;
+    mask-image: none;
+    overflow: visible;
+  }
+}
+
+/* Scrollytelling stage (sticky inner, long outer) */
+.scroll-tell {
+  position: relative;
+}
+
+.scroll-tell-shell {
+  position: relative;
+  height: 90vh;
+}
+
+.scroll-tell-stage {
+  position: sticky;
+  top: 5vh;
+  height: 58vh;
+  padding: 0.5rem 0;
+}
+
+@media (max-width: 1024px) {
+  .scroll-tell-shell {
+    height: auto;
+  }
+  .scroll-tell-stage {
+    position: static;
+    top: auto;
+    height: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  /* On narrower viewports, disable the pinned behavior to avoid layout issues */
+  .scroll-tell-stage {
+    position: static;
+    top: auto;
+    height: auto;
+  }
+  .scroll-tell-shell {
+    height: auto;
+  }
+}
+
 @keyframes shimmer {
   0%, 100% {
     opacity: 1;

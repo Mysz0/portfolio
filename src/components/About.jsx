@@ -3,13 +3,13 @@ import { Code, Palette, Zap } from 'lucide-react'
 
 export default function About() {
   const skills = [
-    { icon: Code, label: 'Development', desc: 'React, Vue, Next.js, TypeScript, Tailwind CSS' },
-    { icon: Palette, label: 'Design', desc: 'UI/UX, Glass-morphism, Theme systems, Animations' },
+    { icon: Code, label: 'Development', desc: 'React, Next.js, TypeScript, Tailwind CSS' },
+    { icon: Palette, label: 'Design', desc: 'UI/UX, Translucent effects, Theme systems, Animations' },
     { icon: Zap, label: 'Performance', desc: 'Optimization, Firebase, Supabase, Vercel' }
   ]
 
   return (
-    <section id="about" className="py-16 sm:py-20">
+    <section id="about" className="py-12 sm:py-16">
       <div className="smart-glass p-8 sm:p-12" style={{ animation: 'fadeInUp 0.8s ease-out 0.1s backwards', borderRadius: '20px' }}>
         <h2 className="text-3xl sm:text-4xl font-black mb-8" style={{
           backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
@@ -24,7 +24,7 @@ export default function About() {
             I'm a passionate frontend developer with expertise in building responsive, accessible, and performant web applications. With a focus on modern technologies and best practices, I create digital experiences that users love.
           </p>
           <p className="text-[var(--theme-text-body)] leading-relaxed text-lg">
-            My toolkit includes React, Vue, Next.js, and Tailwind CSS. I specialize in dynamic theming systems, glass-morphism design, and smooth animations that bring interfaces to life. Every project is an opportunity to push the boundaries of what's possible on the web.
+            My toolkit includes React, Next.js, TypeScript, and Tailwind CSS. I specialize in dynamic theming systems, translucent effects, and smooth animations that bring interfaces to life. Every project is an opportunity to push the boundaries of what's possible on the web.
           </p>
         </div>
         

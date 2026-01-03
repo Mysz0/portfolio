@@ -18,16 +18,19 @@ const keyboards = [
 	},
 	{
 		title: 'Dusk67',
-		desc: 'Sleek 67-key layout with boutique switches and top-tier stabilizers for refined typing experience.',
+		desc: 'Sleek wooden keyboard with a 67-key layout featuring boutique switches and top-tier stabilizers for a refined typing experience.',
 		specs: ['Siliworks x Napworks Nap', 'Typeplus x YIKB Stabs', 'PBTfans Classic Keycaps'],
 		year: '2025',
 		color: '#a855f7'
 	}
 ]
 
+
 export default function Keyboards() {
 	return (
-		<section id="keyboards" className="py-16 sm:py-20">
+		<section id="keyboards" className="py-4 sm:py-8 scroll-tell">
+			<div className="scroll-tell-shell">
+				<div className="scroll-tell-stage">
 			<div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
 				<h2 className="text-3xl sm:text-4xl font-black" style={{
 					backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
@@ -49,7 +52,7 @@ export default function Keyboards() {
 						key={kb.title}
 						className="smart-glass p-6 sm:p-7 flex flex-col"
 						style={{
-							animation: `fadeInUp 0.7s ease-out ${0.05 + idx * 0.05}s backwards`,
+							animation: `fadeInUp 0.6s ease-out ${0.02 + idx * 0.04}s backwards`,
 							borderRadius: '18px',
 							borderColor: `${kb.color}33`
 						}}
@@ -98,6 +101,8 @@ export default function Keyboards() {
 					</article>
 				))}
 			</div>
-		</section>
+				</div>
+			</div>
+			</section>
 	)
 }

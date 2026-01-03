@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Github, Sparkles, LayoutGrid, Wrench, Archive } from 'lucide-react'
 
 const tabs = [
@@ -67,115 +67,178 @@ const tabs = [
 
 export default function Projects() {
   const [active, setActive] = useState('featured')
+  const [tabTween, setTabTween] = useState(0)
+  const [progress, setProgress] = useState(0)
+  const sectionRef = useRef(null)
   const activeTab = tabs.find(t => t.id === active) ?? tabs[0]
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const el = sectionRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const vh = window.innerHeight
+      const total = Math.max(rect.height - vh * 0.6, 1)
+      const offset = Math.min(Math.max(vh * 0.5 - rect.top, 0), total)
+      setProgress(offset / total)
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+    }
+  }, [])
+
+  const spring = (value, factor = 1) => value * factor
+
+  // lightweight tween to drive tab content entrance
+  useEffect(() => {
+    let raf
+    const start = performance.now()
+    const duration = 280
+    const tick = (now) => {
+      const t = Math.min((now - start) / duration, 1)
+      setTabTween(t)
+      if (t < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [active])
+
   return (
-    <section id="projects" className="py-16 sm:py-20">
-      <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-        <h2 className="text-3xl sm:text-4xl font-black" style={{
-          backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}>
-          Builds
-        </h2>
-        <div className="inline-flex items-center gap-2 px-3 py-2 smart-glass" style={{ borderRadius: '12px' }}>
-          <LayoutGrid size={16} style={{ color: 'rgb(var(--theme-primary))' }} />
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Modular & Themed</span>
+    <section
+      id="projects"
+      className="py-4 sm:py-8 scroll-tell"
+      ref={sectionRef}
+    >
+      <div className="scroll-tell-shell">
+        <div className="scroll-tell-stage">
+        <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+          <h2 className="text-3xl sm:text-4xl font-black" style={{
+            backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}>
+            Builds
+          </h2>
+          <div className="inline-flex items-center gap-2 px-3 py-2 smart-glass" style={{ borderRadius: '12px' }}>
+            <LayoutGrid size={16} style={{ color: 'rgb(var(--theme-primary))' }} />
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Modular & Themed</span>
+          </div>
         </div>
-      </div>
 
-      <div className="inline-flex gap-2 mb-8 flex-wrap">
-        {tabs.map((tab) => {
-          const Icon = tab.icon
-          const isActive = tab.id === active
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActive(tab.id)}
-              className="px-4 py-2 smart-glass flex items-center gap-2 text-sm font-semibold transition-all"
-              style={{
-                borderRadius: '12px',
-                backgroundColor: isActive ? 'rgba(var(--theme-primary), 0.12)' : undefined,
-                borderColor: isActive ? 'rgba(var(--theme-primary), 0.35)' : undefined,
-                color: isActive ? 'rgb(var(--theme-primary))' : 'var(--theme-text-body)'
-              }}
-            >
-              <Icon size={14} />
-              {tab.label}
-            </button>
-          )
-        })}
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2 transition-all duration-300" style={{ minHeight: '400px' }}>
-        {activeTab.items.map((p, idx) => (
-          <article 
-            key={p.title} 
-            className="smart-glass p-6 sm:p-7 flex flex-col"
-            style={{
-              animation: `fadeInUp 0.7s ease-out ${0.05 + idx * 0.05}s backwards`,
-              borderRadius: '18px',
-              borderColor: `${p.color}33`
-            }}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div 
-                className="px-3 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+        <div className="inline-flex gap-2 mb-8 flex-wrap">
+          {tabs.map((tab) => {
+            const Icon = tab.icon
+            const isActive = tab.id === active
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActive(tab.id)}
+                className="px-4 py-2 smart-glass flex items-center gap-2 text-sm font-semibold transition-all"
                 style={{
-                  backgroundColor: `${p.color}1a`,
-                  color: p.color,
-                  boxShadow: `0 10px 28px -14px ${p.color}99`
+                  borderRadius: '12px',
+                  backgroundColor: isActive ? 'rgba(var(--theme-primary), 0.12)' : undefined,
+                  borderColor: isActive ? 'rgba(var(--theme-primary), 0.35)' : undefined,
+                  color: isActive ? 'rgb(var(--theme-primary))' : 'var(--theme-text-body)'
                 }}
               >
-                <span className="text-xs font-black whitespace-nowrap">{p.year}</span>
-              </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[var(--theme-text-muted)]">{activeTab.label}</span>
-            </div>
+                <Icon size={14} />
+                {tab.label}
+              </button>
+            )
+          })}
+        </div>
 
-            <h3 className="text-xl font-black mb-2 text-[var(--theme-text-title)]" style={{ lineHeight: 1.2 }}>
-              {p.title}
-            </h3>
-            <p className="text-[var(--theme-text-muted)] mb-5 leading-relaxed">
-              {p.desc}
-            </p>
+        <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2" style={{ minHeight: '420px' }}>
+          {activeTab.items.map((p, idx) => {
+            const start = idx * 0.06
+            const end = start + 0.9
+            const t = Math.min(Math.max((progress - start) / Math.max(end - start, 0.0001), 0), 1)
+            const blended = Math.min(1, t * 0.9 + tabTween * 0.4)
+            const dir = idx % 2 === 0 ? -1 : 1
+            const translateX = spring(40 * (1 - blended) * dir)
+            const translateY = spring(14 * (1 - blended))
+            const scale = 0.94 + 0.06 * blended
+            const opacity = 0.4 + 0.6 * blended
+            const blur = 5 * (1 - blended)
 
-            <div className="flex flex-wrap gap-2 mb-5">
-              {p.tech.map((t) => (
-                <span 
-                  key={t}
-                  className="text-xs font-semibold px-3 py-1"
-                  style={{
-                    backgroundColor: `${p.color}12`,
-                    color: p.color,
-                    borderRadius: '999px',
-                    border: `1px solid ${p.color}33`
-                  }}
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-
-            {p.link && p.link !== '#' ? (
-              <a 
-                href={p.link} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 font-black text-sm uppercase tracking-wider"
-                style={{ color: p.color }}
+            return (
+              <article 
+                key={p.title} 
+                className="smart-glass p-6 sm:p-7 flex flex-col"
+                style={{
+                  transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+                  opacity,
+                  filter: `blur(${blur}px)`,
+                  transition: 'transform 140ms linear, opacity 120ms linear, filter 160ms linear',
+                  borderRadius: '18px',
+                  borderColor: `${p.color}33`
+                }}
               >
-                <Github size={16} />
-                View on GitHub
-              </a>
-            ) : (
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--theme-text-muted)]">
-                Offline / No repo
-              </span>
-            )}
-          </article>
-        ))}
+                <div className="flex items-start justify-between mb-4">
+                  <div 
+                    className="px-3 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{
+                      backgroundColor: `${p.color}1a`,
+                      color: p.color,
+                      boxShadow: `0 10px 28px -14px ${p.color}99`
+                    }}
+                  >
+                    <span className="text-xs font-black whitespace-nowrap">{p.year}</span>
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--theme-text-muted)]">{activeTab.label}</span>
+                </div>
+
+                <h3 className="text-xl font-black mb-2 text-[var(--theme-text-title)]" style={{ lineHeight: 1.2 }}>
+                  {p.title}
+                </h3>
+                <p className="text-[var(--theme-text-muted)] mb-5 leading-relaxed">
+                  {p.desc}
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {p.tech.map((t) => (
+                    <span 
+                      key={t}
+                      className="text-xs font-semibold px-3 py-1"
+                      style={{
+                        backgroundColor: `${p.color}12`,
+                        color: p.color,
+                        borderRadius: '999px',
+                        border: `1px solid ${p.color}33`
+                      }}
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+
+                {p.link && p.link !== '#' ? (
+                  <a 
+                    href={p.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 font-black text-sm uppercase tracking-wider"
+                    style={{ color: p.color }}
+                  >
+                    <Github size={16} />
+                    View on GitHub
+                  </a>
+                ) : (
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[var(--theme-text-muted)]">
+                    Offline / No repo
+                  </span>
+                )}
+              </article>
+            )
+          })}
+        </div>
+        </div>
       </div>
     </section>
   )
