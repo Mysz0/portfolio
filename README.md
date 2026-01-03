@@ -1,28 +1,19 @@
-# Myszo — Personal Website (Frontend)
+# Myszo — Portfolio
 
-This is a lightweight Vite + React frontend scaffold with Tailwind CSS (v4) for a sleek personal site.
+Welcome to my personal portfolio! This site showcases my projects, skills, and hobbies, including custom keyboards and software builds.
 
-Quick start
+## Sections
 
-```bash
-npm install
-npm run dev
-```
+- **Hero**: A brief introduction about me.
+- **About**: My skills and expertise.
+- **Projects**: Featured software builds and utilities.
+- **Keyboards**: My custom mechanical keyboard builds.
+- **Contact**: Get in touch with me.
 
-Build
+## Highlights
 
-```bash
-npm run build
-npm run preview
-```
+- Built with **React** and **Vite** for a fast and modern experience.
+- Styled using **Tailwind CSS** with a glassmorphism theme.
+- Fully responsive and optimized for all devices.
 
-Files of interest:
-
-- `src/App.jsx` — main layout
-- `src/components` — `Hero`, `About`, `Projects`, `Contact`, `Footer`
-
-Next steps: replace placeholder text in components with your bio, project links, and images.
-
-Notes
-
-- Tailwind v4 uses a single import in `src/index.css` (`@import "tailwindcss";`), no config files are needed.
+Feel free to explore and reach out if you'd like to collaborate or learn more about my work!
