@@ -70,6 +70,7 @@ export default function Projects() {
   const [tabTween, setTabTween] = useState(0)
   const [progress, setProgress] = useState(0)
   const sectionRef = useRef(null)
+  const [inView, setInView] = useState(false)
   const activeTab = tabs.find(t => t.id === active) ?? tabs[0]
 
   useEffect(() => {
@@ -90,6 +91,17 @@ export default function Projects() {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('resize', handleScroll)
     }
+  }, [])
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.2 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
   }, [])
 
   const spring = (value, factor = 1) => value * factor
@@ -113,6 +125,8 @@ export default function Projects() {
       id="projects"
       className="py-4 sm:py-8 scroll-tell"
       ref={sectionRef}
+      style={{ '--scroll-p': progress }}
+      data-active={inView}
     >
       <div className="scroll-tell-shell">
         <div className="scroll-tell-stage">
@@ -156,26 +170,33 @@ export default function Projects() {
 
         <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2" style={{ minHeight: '420px' }}>
           {activeTab.items.map((p, idx) => {
-            const start = idx * 0.06
-            const end = start + 0.9
-            const t = Math.min(Math.max((progress - start) / Math.max(end - start, 0.0001), 0), 1)
-            const blended = Math.min(1, t * 0.9 + tabTween * 0.4)
+            // Dramatic spring easing
+            const ease = (t) => {
+              const c4 = (2 * Math.PI) / 3
+              return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1
+            }
+            
+            const start = idx * 0.18
+            const end = start + 0.55
+            const rawT = Math.min(Math.max((progress - start) / Math.max(end - start, 0.0001), 0), 1)
+            const t = ease(rawT)
+            const blended = Math.min(1, t * 0.8 + tabTween * 0.4)
+            
             const dir = idx % 2 === 0 ? -1 : 1
-            const translateX = spring(40 * (1 - blended) * dir)
-            const translateY = spring(14 * (1 - blended))
-            const scale = 0.94 + 0.06 * blended
-            const opacity = 0.4 + 0.6 * blended
-            const blur = 5 * (1 - blended)
+            const translateX = 60 * (1 - blended) * dir
+            const translateY = 80 * (1 - blended)
+            const rotate = 8 * (1 - blended) * dir
+            const scale = 0.85 + 0.15 * blended
+            const opacity = 0 + 1 * blended
 
             return (
               <article 
                 key={p.title} 
                 className="smart-glass p-6 sm:p-7 flex flex-col"
                 style={{
-                  transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+                  transform: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
                   opacity,
-                  filter: `blur(${blur}px)`,
-                  transition: 'transform 140ms linear, opacity 120ms linear, filter 160ms linear',
+                  transition: 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
                   borderRadius: '18px',
                   borderColor: `${p.color}33`
                 }}

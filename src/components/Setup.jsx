@@ -75,6 +75,7 @@ export default function Setup() {
   const [progress, setProgress] = useState(0)
   const [tabTween, setTabTween] = useState(0)
   const sectionRef = useRef(null)
+  const [inView, setInView] = useState(false)
   const categories = activeTab === 'web' ? webCategories : linuxCategories
 
   useEffect(() => {
@@ -97,6 +98,17 @@ export default function Setup() {
     }
   }, [])
 
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.2 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
   // simple tween on tab change to animate content entrance
   useEffect(() => {
     let raf
@@ -116,6 +128,8 @@ export default function Setup() {
       id="setup"
       className="py-4 sm:py-8 scroll-tell"
       ref={sectionRef}
+      style={{ '--scroll-p': progress }}
+      data-active={inView}
     >
       <div className="scroll-tell-shell">
         <div className="scroll-tell-stage">
@@ -159,26 +173,35 @@ export default function Setup() {
           <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-3" style={{ minHeight: '420px' }}>
             {categories.map((category, catIdx) => {
               const Icon = category.icon
-              const start = catIdx * 0.06
-              const end = start + 0.9
-              const t = Math.min(Math.max((progress - start) / Math.max(end - start, 0.0001), 0), 1)
-              const blended = Math.min(1, t * 0.9 + tabTween * 0.4)
-              const dir = catIdx % 2 === 0 ? -1 : 1
-              const translateX = 40 * (1 - blended) * dir
-              const translateY = 14 * (1 - blended)
-              const scale = 0.94 + 0.06 * blended
-              const opacity = 0.4 + 0.6 * blended
-              const blur = 5 * (1 - blended)
+              // Bouncy spring easing
+              const ease = (t) => {
+                const c4 = (2 * Math.PI) / 3
+                return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1
+              }
+              
+              const start = catIdx * 0.15
+              const end = start + 0.5
+              const rawT = Math.min(Math.max((progress - start) / Math.max(end - start, 0.0001), 0), 1)
+              const t = ease(rawT)
+              const blended = Math.min(1, t * 0.8 + tabTween * 0.4)
+              
+              // Staggered cascade from different directions
+              const directions = [[-1, -1], [0, 1], [1, -1]]
+              const [dirX, dirY] = directions[catIdx % 3]
+              const translateX = 50 * (1 - blended) * dirX
+              const translateY = 70 * (1 - blended) * (dirY === 0 ? 1 : dirY)
+              const rotate = 6 * (1 - blended) * dirX
+              const scale = 0.8 + 0.2 * blended
+              const opacity = 0 + 1 * blended
 
               return (
                 <article
                   key={category.name}
                   className="smart-glass p-6 sm:p-7 flex flex-col"
                   style={{
-                    transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+                    transform: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
                     opacity,
-                    filter: `blur(${blur}px)`,
-                    transition: 'transform 140ms linear, opacity 120ms linear, filter 160ms linear',
+                    transition: 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
                     borderRadius: '18px',
                     borderColor: `${category.color}33`
                   }}

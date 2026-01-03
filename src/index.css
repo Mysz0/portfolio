@@ -1,3 +1,4 @@
+/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -50,6 +51,35 @@
   }
 }
 
+@keyframes floaty {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes soft-glow {
+  0%, 100% {
+    opacity: 0.08;
+  }
+  50% {
+    opacity: 0.14;
+  }
+}
+
+@keyframes shimmerLine {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
 /* Scrollable section panels to keep the page tight on desktop */
 .section-panel {
   position: relative;
@@ -96,6 +126,27 @@
 /* Scrollytelling stage (sticky inner, long outer) */
 .scroll-tell {
   position: relative;
+  --scroll-p: 0;
+}
+
+/* ========== ENHANCED BACKGROUND GLASSMORPHISM ========== */
+html, body {
+  background: linear-gradient(135deg, #0a0e27 0%, #0f172a 50%, #1a1a2e 100%);
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: soft-glow 4s ease-in-out infinite;
 }
 
 .scroll-tell-shell {
@@ -122,7 +173,6 @@
 }
 
 @media (max-width: 900px) {
-  /* On narrower viewports, disable the pinned behavior to avoid layout issues */
   .scroll-tell-stage {
     position: static;
     top: auto;
@@ -139,6 +189,61 @@
   }
   50% {
     opacity: 0.7;
+  }
+}
+
+/* Soft card rise animation */
+.anim-soft-card {
+  animation: soft-fade-rise 0.85s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.no-anim {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  transition: none !important;
+  will-change: auto !important;
+  visibility: visible !important;
+}
+
+.no-anim * {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  will-change: auto !important;
+}
+
+.static-card {
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+.instant, .instant * {
+  animation: none !important;
+  transition: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  will-change: auto !important;
+}
+
+@keyframes soft-fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
   }
 }
 
@@ -204,15 +309,17 @@ body {
   background: var(--theme-card-bg);
   border: 1px solid var(--theme-border);
   backdrop-filter: blur(10px);
-  transition: all var(--trans-speed) var(--trans-timing);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   border-radius: 16px;
 }
 
 .smart-glass:hover {
   background: var(--theme-card-hover);
   border-color: var(--theme-border-hover);
-  box-shadow: var(--theme-shadow-hover);
-  transform: translateY(-2px);
+  box-shadow: var(--theme-shadow-hover), 0 0 40px -12px rgba(var(--theme-primary), 0.25);
+  transform: translateY(-4px);
+  backdrop-filter: blur(28px) brightness(1.15);
+  -webkit-backdrop-filter: blur(28px) brightness(1.15);
 }
 
 .theme-glow {
@@ -268,29 +375,108 @@ a:hover {
 /* Scroll Animations */
 .scroll-reveal {
   opacity: 0;
-  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(24px) scale(0.95) rotateX(4deg);
+  filter: blur(6px);
+  transform-origin: 50% 60%;
+  will-change: transform, opacity, filter;
 }
 
 .scroll-reveal.revealed {
-  opacity: 1;
-  transform: none !important;
+  animation: reveal-pop 0.85s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes reveal-pop {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateX(0deg);
+    filter: blur(0px);
+  }
 }
 
 .scroll-slide-up {
-  transform: translateY(50px);
+  opacity: 0;
+  transform: translateY(48px) scale(0.94) rotateX(6deg);
+  filter: blur(6px);
+}
+
+.scroll-slide-up.revealed {
+  animation: lift-tilt 0.9s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes lift-tilt {
+  40% {
+    transform: translateY(-6px) scale(1.02) rotateX(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateX(0deg);
+    filter: blur(0px);
+  }
 }
 
 .scroll-slide-left {
-  transform: translateX(-50px);
+  opacity: 0;
+  transform: translate(-36px, 10px) scale(0.94) rotateY(-8deg) rotateZ(-2deg);
+  filter: blur(6px);
+  transform-origin: 40% 60%;
+}
+
+.scroll-slide-left.revealed {
+  animation: drift-in-left 0.9s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes drift-in-left {
+  45% {
+    transform: translate(6px, -4px) scale(1.01) rotateY(2deg) rotateZ(0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotateY(0deg) rotateZ(0deg);
+    filter: blur(0px);
+  }
 }
 
 .scroll-slide-right {
-  transform: translateX(50px);
+  opacity: 0;
+  transform: translate(36px, 10px) scale(0.94) rotateY(8deg) rotateZ(2deg);
+  filter: blur(6px);
+  transform-origin: 60% 60%;
+}
+
+.scroll-slide-right.revealed {
+  animation: drift-in-right 0.9s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes drift-in-right {
+  45% {
+    transform: translate(-6px, -4px) scale(1.01) rotateY(-2deg) rotateZ(-0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotateY(0deg) rotateZ(0deg);
+    filter: blur(0px);
+  }
 }
 
 .scroll-scale {
-  transform: scale(0.9);
+  opacity: 0;
+  transform: scale(0.9) translateY(24px);
+  filter: blur(4px);
+}
+
+.scroll-scale.revealed {
+  animation: scale-pop 0.8s cubic-bezier(0.25, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes scale-pop {
+  60% {
+    transform: scale(1.04) translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
 }
 
 html {

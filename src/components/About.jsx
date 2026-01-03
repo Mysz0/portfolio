@@ -9,8 +9,15 @@ export default function About() {
   ]
 
   return (
-    <section id="about" className="py-12 sm:py-16">
-      <div className="smart-glass p-8 sm:p-12" style={{ animation: 'fadeInUp 0.8s ease-out 0.1s backwards', borderRadius: '20px' }}>
+    <section
+      id="about"
+      className="py-12 sm:py-16"
+      style={{ animation: 'fadeInUp 0.8s ease-out both' }}
+    >
+      <div
+        className="smart-glass p-8 sm:p-12 anim-soft-card"
+        style={{ borderRadius: '20px' }}
+      >
         <h2 className="text-3xl sm:text-4xl font-black mb-8" style={{
           backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
           backgroundClip: 'text',

@@ -48,18 +48,14 @@ export default function App() {
     <div className="min-h-screen bg-[var(--theme-map-bg)] text-[var(--theme-text-title)] transition-colors duration-700 relative">
       <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
       <div className="max-w-5xl mx-auto px-5 py-3">
-        <div className="scroll-reveal scroll-slide-up">
+        <div id="hero" className="scroll-reveal scroll-slide-up">
           <Hero />
         </div>
-        <div className="scroll-reveal scroll-slide-left">
-          <About />
-        </div>
+        <About />
         <Projects />
         <Setup />
         <Keyboards />
-        <div className="scroll-reveal scroll-slide-up">
-          <Contact />
-        </div>
+        <Contact />
         <div className="scroll-reveal scroll-slide-left">
           <Footer />
         </div>
