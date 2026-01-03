@@ -21,10 +21,7 @@ export default function App() {
     const root = document.documentElement;
     root.classList.toggle('dark', isDark);
     localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
-  }, [isDark]);
 
-  useEffect(() => {
-    const root = document.documentElement;
     const computedThemeColor = getComputedStyle(root)
       .getPropertyValue('--theme-map-bg')
       .trim() || (isDark ? '#0a0a0a' : '#f8fafc');
@@ -38,11 +35,11 @@ export default function App() {
       return meta;
     };
 
-    // Keep browser and iOS safe area bars in sync with the chosen theme.
+    // Keep browser and iOS safe area/status bars in sync with the chosen theme before paint.
     getOrCreateMeta('theme-color').setAttribute('content', computedThemeColor);
     getOrCreateMeta('apple-mobile-web-app-status-bar-style').setAttribute(
       'content',
-      isDark ? 'black' : 'default'
+      isDark ? 'black-translucent' : 'default'
     );
   }, [isDark]);
 
