@@ -28,7 +28,7 @@ const keyboards = [
 
 
 export default function Keyboards() {
-	const [progress, setProgress] = useState(0)
+	const [progress, setProgress] = useState(1)
 	const [simpleMotion, setSimpleMotion] = useState(false)
 	const sectionRef = useRef(null)
 	const [inView, setInView] = useState(false)

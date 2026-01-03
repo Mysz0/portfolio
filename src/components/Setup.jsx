@@ -72,8 +72,8 @@ const linuxCategories = [
 
 export default function Setup() {
   const [activeTab, setActiveTab] = useState('web')
-  const [progress, setProgress] = useState(0)
-  const [tabTween, setTabTween] = useState(0)
+  const [progress, setProgress] = useState(1)
+  const [tabTween, setTabTween] = useState(1)
   const [simpleMotion, setSimpleMotion] = useState(false)
   const sectionRef = useRef(null)
   const [inView, setInView] = useState(false)
