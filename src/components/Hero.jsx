@@ -16,7 +16,7 @@ export default function Hero() {
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}>
-            Myszo — I build bold, themeable interfaces.
+            Myszo - I build bold, themeable interfaces.
           </h1>
           <p className="text-base sm:text-lg text-[var(--theme-text-body)] mb-8 leading-relaxed max-w-2xl">
             React and Vue developer focused on dynamic theme systems, glass-morphism, and performance. Less fluff, more polish: sharp layouts, motion that guides, and code that ships.
