@@ -24,6 +24,29 @@ export default function App() {
   }, [isDark]);
 
   useEffect(() => {
+    const root = document.documentElement;
+    const computedThemeColor = getComputedStyle(root)
+      .getPropertyValue('--theme-map-bg')
+      .trim() || (isDark ? '#0a0a0a' : '#f8fafc');
+
+    const getOrCreateMeta = (name) => {
+      const existing = document.querySelector(`meta[name="${name}"]`);
+      if (existing) return existing;
+      const meta = document.createElement('meta');
+      meta.setAttribute('name', name);
+      document.head.appendChild(meta);
+      return meta;
+    };
+
+    // Keep browser and iOS safe area bars in sync with the chosen theme.
+    getOrCreateMeta('theme-color').setAttribute('content', computedThemeColor);
+    getOrCreateMeta('apple-mobile-web-app-status-bar-style').setAttribute(
+      'content',
+      isDark ? 'black' : 'default'
+    );
+  }, [isDark]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

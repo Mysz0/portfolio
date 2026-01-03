@@ -133,6 +133,7 @@
 html, body {
   background: linear-gradient(135deg, #0a0e27 0%, #0f172a 50%, #1a1a2e 100%);
   position: relative;
+  touch-action: pan-x pan-y;
 }
 
 body::before {
