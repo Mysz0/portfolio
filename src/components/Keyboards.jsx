@@ -29,8 +29,20 @@ const keyboards = [
 
 export default function Keyboards() {
 	const [progress, setProgress] = useState(0)
+	const [simpleMotion, setSimpleMotion] = useState(false)
 	const sectionRef = useRef(null)
 	const [inView, setInView] = useState(false)
+
+	useEffect(() => {
+		const simple =
+			(typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches) ||
+			(typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+
+		setSimpleMotion(simple)
+		if (simple) {
+			setProgress(1)
+		}
+	}, [])
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -99,15 +111,15 @@ export default function Keyboards() {
 							const start = idx * 0.2
 							const end = start + 0.5
 							const rawT = Math.min(Math.max((progress - start) / Math.max(end - start, 0.0001), 0), 1)
-							const t = ease(rawT)
-							
-							// Fan out from center
+							const t = simpleMotion ? 1 : ease(rawT)
+			
+							// Fan out from center (disabled when simpleMotion)
 							const fanAngles = [-12, 0, 12]
-							const rotate = fanAngles[idx % 3] * (1 - t)
-							const translateY = 100 * (1 - t)
-							const translateX = (idx - 1) * 40 * (1 - t)
-							const scale = 0.75 + 0.25 * t
-							const opacity = 0 + 1 * t
+							const rotate = simpleMotion ? 0 : fanAngles[idx % 3] * (1 - t)
+							const translateY = simpleMotion ? 0 : 100 * (1 - t)
+							const translateX = simpleMotion ? 0 : (idx - 1) * 40 * (1 - t)
+							const scale = simpleMotion ? 1 : 0.75 + 0.25 * t
+							const opacity = simpleMotion ? 1 : t
 
 							return (
 								<article

@@ -69,9 +69,22 @@ export default function Projects() {
   const [active, setActive] = useState('featured')
   const [tabTween, setTabTween] = useState(0)
   const [progress, setProgress] = useState(0)
+  const [simpleMotion, setSimpleMotion] = useState(false)
   const sectionRef = useRef(null)
   const [inView, setInView] = useState(false)
   const activeTab = tabs.find(t => t.id === active) ?? tabs[0]
+
+  useEffect(() => {
+    const simple =
+      (typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches) ||
+      (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+
+    setSimpleMotion(simple)
+    if (simple) {
+      setProgress(1)
+      setTabTween(1)
+    }
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -180,14 +193,14 @@ export default function Projects() {
             const end = start + 0.55
             const rawT = Math.min(Math.max((progress - start) / Math.max(end - start, 0.0001), 0), 1)
             const t = ease(rawT)
-            const blended = Math.min(1, t * 0.8 + tabTween * 0.4)
+            const blended = simpleMotion ? 1 : Math.min(1, t * 0.8 + tabTween * 0.4)
             
             const dir = idx % 2 === 0 ? -1 : 1
-            const translateX = 60 * (1 - blended) * dir
-            const translateY = 80 * (1 - blended)
-            const rotate = 8 * (1 - blended) * dir
-            const scale = 0.85 + 0.15 * blended
-            const opacity = 0 + 1 * blended
+            const translateX = simpleMotion ? 0 : 60 * (1 - blended) * dir
+            const translateY = simpleMotion ? 0 : 80 * (1 - blended)
+            const rotate = simpleMotion ? 0 : 8 * (1 - blended) * dir
+            const scale = simpleMotion ? 1 : 0.85 + 0.15 * blended
+            const opacity = simpleMotion ? 1 : blended
 
             return (
               <article 
