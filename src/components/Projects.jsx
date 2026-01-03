@@ -109,7 +109,7 @@ export default function Projects() {
         })}
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2 transition-all duration-300" style={{ minHeight: '400px' }}>
         {activeTab.items.map((p, idx) => (
           <article 
             key={p.title} 
