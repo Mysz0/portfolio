@@ -134,7 +134,8 @@ html, body {
   background: linear-gradient(135deg, #0a0e27 0%, #0f172a 50%, #1a1a2e 100%);
   position: relative;
   background-color: var(--theme-safe-area);
-  overscroll-behavior: none;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
   max-width: 100%;
   overflow-x: hidden;
   touch-action: pan-x pan-y;
