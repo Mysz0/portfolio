@@ -143,14 +143,14 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="py-4 sm:py-8 scroll-tell"
+      className="py-24 sm:py-40 scroll-tell"
       ref={sectionRef}
       style={{ '--scroll-p': progress }}
       data-active={inView}
     >
       <div className="scroll-tell-shell">
         <div className="scroll-tell-stage">
-        <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+        <div className="flex items-center justify-between gap-6 mb-10 flex-wrap">
           <h2 className="text-3xl sm:text-4xl font-black" style={{
             backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
             backgroundClip: 'text',
@@ -165,7 +165,7 @@ export default function Projects() {
           </div>
         </div>
 
-        <div className="inline-flex gap-2 mb-8 flex-wrap">
+        <div className="inline-flex gap-4 mb-14 flex-wrap">
           {tabs.map((tab) => {
             const Icon = tab.icon
             const isActive = tab.id === active
@@ -188,7 +188,7 @@ export default function Projects() {
           })}
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2" style={{ minHeight: '420px' }}>
+        <div className="grid gap-10 sm:grid-cols-1 lg:grid-cols-2" style={{ minHeight: '420px' }}>
           {activeTab.items.map((p, idx) => {
             // Dramatic spring easing
             const ease = (t) => {

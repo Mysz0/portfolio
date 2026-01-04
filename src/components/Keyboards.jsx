@@ -84,7 +84,7 @@ export default function Keyboards() {
 	return (
 		<section
 			id="keyboards"
-			className="py-4 sm:py-8 scroll-tell"
+			className="py-24 sm:py-40 scroll-tell"
 			ref={sectionRef}
 			style={{ '--scroll-p': progress }}
 			data-active={inView}
