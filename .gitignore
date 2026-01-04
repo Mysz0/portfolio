@@ -1,3 +1,46 @@
+# Node
 node_modules/
+
+# Build output
+build/
 dist/
-.env
+
+# Vite cache
+.vite/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files
+.env*
+
+# VS Code
+.vscode/
+
+# Coverage
+coverage/
+
+# Misc
+*.local
+*.sublime-workspace
+*.sublime-project
+
+# Mac system files
+.AppleDouble
+.LSOverride
+Icon?
+
+# IDEs
+.idea/
+
+# Optional: lock files (uncomment if you want to ignore lock files)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
