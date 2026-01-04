@@ -99,19 +99,6 @@
   mask-image: linear-gradient(180deg, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.98) 100%);
 }
 
-.section-panel-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.section-panel-content::-webkit-scrollbar-thumb {
-  background: rgba(var(--theme-primary), 0.35);
-  border-radius: 999px;
-}
-
-.section-panel-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
 @media (max-width: 1024px) {
   .section-panel {
     overflow: visible;
@@ -130,30 +117,20 @@
 }
 
 /* ========== ENHANCED BACKGROUND GLASSMORPHISM ========== */
-html, body {
-  background: linear-gradient(135deg, #0a0e27 0%, #0f172a 50%, #1a1a2e 100%);
-  position: relative;
-  background-color: var(--theme-safe-area);
-  overscroll-behavior-x: none;
-  overscroll-behavior-y: auto;
-  max-width: 100%;
-  overflow-x: hidden;
-  touch-action: auto;
+html {
+  background: #000000;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-  animation: soft-glow 4s ease-in-out infinite;
+body {
+  margin: 0;
+  padding: 0;
+  background: #000000;
 }
+
+#root {
+  background: #000000;
+}
+
 
 .scroll-tell-shell {
   position: relative;
@@ -271,7 +248,6 @@ body::before {
   --theme-text-muted: #6b7280;
   
   --theme-map-bg: #f8fafc;
-  --theme-safe-area: #f8fafc;
   --trans-speed: 0.3s;
   --trans-timing: cubic-bezier(0.4, 0, 0.2, 1);
   color-scheme: light;
@@ -288,23 +264,23 @@ body::before {
   --theme-text-muted: #9ca3af;
   --theme-map-bg: #0a0a0a;
   --theme-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.5);
-  --theme-safe-area: #0b1220;
   color-scheme: dark;
 }
 
 html, body, #root {
   height: 100%;
-  padding-bottom: 0 !important;
+  padding: 0;
+  margin: 0;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  padding-bottom: 0 !important;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background: radial-gradient(circle at 20% 20%, rgba(16,185,129,0.08), transparent 35%),
               radial-gradient(circle at 80% 0%, rgba(59,130,246,0.08), transparent 35%),
               linear-gradient(180deg, #0b1220 0%, #0f172a 35%, #0b1220 100%);
   color: var(--theme-text-title);
-  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
 }
 
 * {
@@ -379,7 +355,6 @@ body {
   box-shadow: var(--theme-shadow-hover), 0 0 40px -12px rgba(var(--theme-primary), 0.25);
   transform: translateY(-4px);
   backdrop-filter: blur(28px) brightness(1.15);
-  -webkit-backdrop-filter: blur(28px) brightness(1.15);
 }
 
 .theme-glow {
@@ -412,24 +387,6 @@ a {
 a:hover {
   color: rgb(var(--theme-primary));
   border-color: rgba(var(--theme-primary), 0.4);
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--theme-map-bg);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgb(var(--theme-primary));
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--theme-primary));
-  opacity: 0.8;
 }
 
 /* Scroll Animations */

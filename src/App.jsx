@@ -23,9 +23,7 @@ export default function App() {
     root.style.colorScheme = isDark ? 'dark' : 'light';
     localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
 
-    const baseColor =
-      getComputedStyle(root).getPropertyValue('--theme-safe-area').trim() ||
-      (isDark ? '#0b1220' : '#f8fafc');
+    const baseColor = isDark ? '#0b1220' : '#f8fafc';
 
     const setMetaColor = (color) => {
       const head = document.head;
@@ -35,28 +33,10 @@ export default function App() {
       meta.setAttribute('name', 'theme-color');
       meta.setAttribute('content', color);
       head.appendChild(meta);
-
-      const statusBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-      if (statusBar) {
-        statusBar.setAttribute('content', isDark ? 'black-translucent' : 'default');
-      }
     };
 
-    // Immediate paint-safe color for Safari/iOS UI chrome
-    document.documentElement.style.backgroundColor = baseColor;
-    document.body.style.backgroundColor = baseColor;
+    // Set theme color for browser UI
     setMetaColor(baseColor);
-
-    // Second pass after CSS vars settle (Safari needs this)
-    requestAnimationFrame(() => {
-      const cssColor =
-        getComputedStyle(root).getPropertyValue('--theme-safe-area').trim() || baseColor;
-      document.documentElement.style.backgroundColor = cssColor;
-      document.body.style.backgroundColor = cssColor;
-      setMetaColor(cssColor);
-      // force repaint hint
-      void document.body.offsetHeight;
-    });
   }, [isDark]);
 
   useEffect(() => {
@@ -82,7 +62,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[var(--theme-map-bg)] text-[var(--theme-text-title)] transition-colors duration-700 relative">
-      <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
+      <div className="fixed top-0 right-0 z-50">
+        <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
+      </div>
       <div className="max-w-5xl mx-auto px-5 py-3">
         <div id="hero" className="scroll-reveal scroll-slide-up">
           <Hero />
