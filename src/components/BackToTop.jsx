@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { ArrowUp } from 'lucide-react'
 
+const PROGRESS_RING_RADIUS = 20
+
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -25,7 +27,7 @@ export default function BackToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const circumference = 2 * Math.PI * 20
+  const circumference = 2 * Math.PI * PROGRESS_RING_RADIUS
 
   return (
     <button
@@ -58,7 +60,7 @@ export default function BackToTop() {
         <circle
           cx="28"
           cy="28"
-          r="20"
+          r={PROGRESS_RING_RADIUS}
           stroke="rgba(16, 185, 129, 0.15)"
           strokeWidth="3"
           fill="none"
@@ -66,7 +68,7 @@ export default function BackToTop() {
         <circle
           cx="28"
           cy="28"
-          r="20"
+          r={PROGRESS_RING_RADIUS}
           stroke="rgb(16, 185, 129)"
           strokeWidth="3"
           fill="none"

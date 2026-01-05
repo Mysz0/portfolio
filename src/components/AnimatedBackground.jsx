@@ -1,5 +1,8 @@
 import React, { useEffect, useRef } from 'react'
 
+const PARTICLE_DENSITY_FACTOR = 15000
+const MAX_CONNECTION_DISTANCE = 150
+
 export default function AnimatedBackground() {
   const canvasRef = useRef(null)
 
@@ -51,7 +54,7 @@ export default function AnimatedBackground() {
     // Initialize particles
     const initParticles = () => {
       particles = []
-      const particleCount = Math.floor((canvas.width * canvas.height) / 15000)
+      const particleCount = Math.floor((canvas.width * canvas.height) / PARTICLE_DENSITY_FACTOR)
       for (let i = 0; i < particleCount; i++) {
         particles.push(new Particle())
       }
@@ -75,8 +78,8 @@ export default function AnimatedBackground() {
           const dy = particleA.y - particleB.y
           const distance = Math.sqrt(dx * dx + dy * dy)
 
-          if (distance < 150) {
-            ctx.strokeStyle = `rgba(16, 185, 129, ${0.15 * (1 - distance / 150)})`
+          if (distance < MAX_CONNECTION_DISTANCE) {
+            ctx.strokeStyle = `rgba(16, 185, 129, ${0.15 * (1 - distance / MAX_CONNECTION_DISTANCE)})`
             ctx.lineWidth = 0.5
             ctx.beginPath()
             ctx.moveTo(particleA.x, particleA.y)

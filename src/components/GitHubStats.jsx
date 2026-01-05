@@ -46,9 +46,9 @@ export default function GitHubStats() {
                 key={stat.label}
                 className="p-5 rounded-xl smart-glass card-accent group"
                 style={{
-                  ['--card-color']: stat.color,
-                  ['--card-color-soft']: `${stat.color}22`,
-                  ['--card-shadow']: `${stat.color}99`,
+                  '--card-color': stat.color,
+                  '--card-color-soft': `${stat.color}22`,
+                  '--card-shadow': `${stat.color}99`,
                   background: `linear-gradient(135deg, ${stat.color}08, transparent)`,
                   borderColor: `${stat.color}33`,
                   animation: `fadeInUp 0.6s ease-out ${idx * 0.1}s both`,
@@ -79,7 +79,7 @@ export default function GitHubStats() {
           border: '1px solid rgba(var(--theme-primary), 0.1)',
         }}>
           <h3 className="text-lg font-bold mb-4 text-[var(--theme-text-title)]">Contribution Activity</h3>
-          <div className="grid grid-cols-52 gap-1">
+          <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(52, minmax(0, 1fr))' }}>
             {Array.from({ length: 364 }).map((_, i) => {
               const intensity = Math.random()
               const opacity = intensity > 0.7 ? 1 : intensity > 0.4 ? 0.6 : intensity > 0.2 ? 0.3 : 0.1
