@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Code, Palette, Zap } from 'lucide-react'
 
 export default function About() {
@@ -8,9 +8,38 @@ export default function About() {
     { icon: Zap, label: 'Performance', desc: 'Optimization, Firebase, Supabase, Vercel' }
   ]
 
+  const detailedSkills = [
+    { name: 'React & Next.js', level: 95, color: '#61dafb' },
+    { name: 'TypeScript', level: 90, color: '#3178c6' },
+    { name: 'Tailwind CSS', level: 98, color: '#06b6d4' },
+    { name: 'UI/UX Design', level: 85, color: '#ec4899' },
+    { name: 'Performance Optimization', level: 88, color: '#10b981' },
+  ]
+
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.2 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <section
       id="about"
+      ref={sectionRef}
       className="py-12 sm:py-16"
       style={{ animation: 'fadeInUp 0.8s ease-out both' }}
     >
@@ -35,7 +64,7 @@ export default function About() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {skills.map((skill, idx) => {
             const Icon = skill.icon
             return (
@@ -51,6 +80,39 @@ export default function About() {
               </div>
             )
           })}
+        </div>
+
+        {/* Skill Progress Bars */}
+        <div className="mt-8">
+          <h3 className="text-xl font-bold mb-6 text-[var(--theme-text-title)]">Technical Proficiency</h3>
+          <div className="space-y-5">
+            {detailedSkills.map((skill, idx) => (
+              <div key={skill.name}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-[var(--theme-text-body)]">{skill.name}</span>
+                  <span className="text-sm font-bold" style={{ color: skill.color }}>
+                    {skill.level}%
+                  </span>
+                </div>
+                <div
+                  className="h-2 rounded-full overflow-hidden"
+                  style={{
+                    backgroundColor: 'rgba(var(--theme-primary), 0.1)',
+                  }}
+                >
+                  <div
+                    className="h-full rounded-full transition-all duration-1000 ease-out"
+                    style={{
+                      width: isVisible ? `${skill.level}%` : '0%',
+                      backgroundColor: skill.color,
+                      boxShadow: `0 0 10px ${skill.color}66`,
+                      transitionDelay: `${idx * 100}ms`,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

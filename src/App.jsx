@@ -7,6 +7,11 @@ import Keyboards from './components/Keyboards'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import ThemeToggle from './components/ThemeToggle'
+import AnimatedBackground from './components/AnimatedBackground'
+import ScrollProgress from './components/ScrollProgress'
+import BackToTop from './components/BackToTop'
+import Navigation from './components/Navigation'
+import GitHubStats from './components/GitHubStats'
 
 export default function App() {
   const [isDark, setIsDark] = useState(() => {
@@ -62,14 +67,19 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[var(--theme-map-bg)] text-[var(--theme-text-title)] transition-colors duration-700 relative">
+      <AnimatedBackground />
+      <ScrollProgress />
+      <Navigation />
+      <BackToTop />
       <div className="fixed top-0 right-0 z-50">
         <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
       </div>
-      <div className="max-w-5xl mx-auto px-5 py-3">
+      <div className="max-w-5xl mx-auto px-5 py-3 relative" style={{ zIndex: 1 }}>
         <div id="hero" className="scroll-reveal scroll-slide-up">
           <Hero />
         </div>
         <About />
+        <GitHubStats />
         <Projects />
         <Setup />
         <Keyboards />
