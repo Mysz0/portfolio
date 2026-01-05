@@ -3,9 +3,9 @@ import { GitBranch, Star, GitFork, TrendingUp } from 'lucide-react'
 
 export default function GitHubStats() {
   const stats = [
-    { icon: GitBranch, label: 'Repositories', value: '15+', color: '#10b981' },
-    { icon: Star, label: 'Stars Earned', value: '50+', color: '#fbbf24' },
-    { icon: GitFork, label: 'Contributions', value: '500+', color: '#3b82f6' },
+    { icon: GitBranch, label: 'Repositories', value: '5+', color: '#10b981' },
+    { icon: Star, label: 'Total Stars', value: '12+', color: '#fbbf24' },
+    { icon: GitFork, label: 'Contributions', value: '200+', color: '#3b82f6' },
     { icon: TrendingUp, label: 'Active Projects', value: '3', color: '#ec4899' },
   ]
 
@@ -79,14 +79,14 @@ export default function GitHubStats() {
           border: '1px solid rgba(var(--theme-primary), 0.1)',
         }}>
           <h3 className="text-lg font-bold mb-4 text-[var(--theme-text-title)]">Contribution Activity</h3>
-          <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(52, minmax(0, 1fr))' }}>
+          <div className="flex flex-wrap gap-1">
             {Array.from({ length: 364 }).map((_, i) => {
               const intensity = Math.random()
               const opacity = intensity > 0.7 ? 1 : intensity > 0.4 ? 0.6 : intensity > 0.2 ? 0.3 : 0.1
               return (
                 <div
                   key={i}
-                  className="w-2 h-2 rounded-sm transition-all duration-300 hover:scale-150"
+                  className="w-2.5 h-2.5 rounded-sm transition-all duration-300 hover:scale-150"
                   style={{
                     backgroundColor: `rgba(16, 185, 129, ${opacity})`,
                     border: '1px solid rgba(16, 185, 129, 0.2)',
