@@ -1,21 +1,39 @@
-import React from 'react'
+import { motion } from 'framer-motion'
+import { Github, Twitter, Mail } from 'lucide-react'
+
+const links = [
+  { icon: Github, label: 'GitHub', href: 'https://github.com/Mysz0' },
+  { icon: Twitter, label: 'Twitter', href: 'https://x.com/Myszo0' },
+  { icon: Mail, label: 'Email', href: 'mailto:dev@urabanradar.app' },
+]
 
 export default function Footer() {
   return (
-    <footer className="py-12 text-center text-[var(--theme-text-muted)] text-sm" style={{
-      borderTop: '1px solid var(--theme-border)',
-      animation: 'fadeInUp 0.8s ease-out 0.4s backwards'
-    }}>
-      <div className="max-w-4xl mx-auto space-y-4">
-        <p>
-          © {new Date().getFullYear()} Myszo — Built with React + Vite
-        </p>
-        <div className="flex items-center justify-center gap-8 text-xs">
-          <a href="https://github.com/Mysz0" target="_blank" rel="noopener noreferrer" className="hover:text-[rgb(var(--theme-primary))] transition-colors">GitHub</a>
-          <a href="https://x.com/Myszo0" target="_blank" rel="noopener noreferrer" className="hover:text-[rgb(var(--theme-primary))] transition-colors">Twitter</a>
-          <a href="mailto:dev@urabanradar.app" className="hover:text-[rgb(var(--theme-primary))] transition-colors">Email</a>
-        </div>
+    <motion.footer
+      className="py-16 text-center max-w-5xl mx-auto px-6 sm:px-8"
+      style={{ borderTop: '1px solid var(--border)' }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+    >
+      <div className="flex items-center justify-center gap-6 mb-6">
+        {links.map(({ icon: Icon, label, href }) => (
+          <a
+            key={label}
+            href={href}
+            target={href.startsWith('mailto') ? undefined : '_blank'}
+            rel={href.startsWith('mailto') ? undefined : 'noopener noreferrer'}
+            className="p-3 glass-card rounded-xl transition-all duration-300 hover:scale-110 hover:border-[var(--accent)]"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            <Icon size={18} />
+          </a>
+        ))}
       </div>
-    </footer>
+      <p className="text-sm text-[var(--text-muted)]">
+        © {new Date().getFullYear()} Myszo — Built with React + Vite
+      </p>
+    </motion.footer>
   )
 }

@@ -1,277 +1,176 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Code2, Palette, Database, Zap, Terminal } from 'lucide-react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Code2, Palette, Database, Terminal } from 'lucide-react'
 
 const webCategories = [
   {
     name: 'Frontend',
     icon: Code2,
-    color: '#3b82f6',
+    color: '#8B5CF6',
     tools: [
       { name: 'React 19', desc: 'Modern UI library' },
       { name: 'TypeScript', desc: 'Type safety & reliability' },
       { name: 'Tailwind CSS', desc: 'Utility-first styling' },
-      { name: 'Vite', desc: 'Lightning-fast build tool' }
-    ]
+      { name: 'Vite', desc: 'Lightning-fast build tool' },
+    ],
   },
   {
     name: 'Backend & Data',
     icon: Database,
-    color: '#10b981',
+    color: '#7BA886',
     tools: [
       { name: 'Supabase', desc: 'Auth & PostgreSQL' },
       { name: 'Firebase', desc: 'Real-time services' },
-      { name: 'Next.js', desc: 'Full-stack framework' }
-    ]
+      { name: 'Next.js', desc: 'Full-stack framework' },
+    ],
   },
   {
     name: 'Design System',
     icon: Palette,
-    color: '#a855f7',
+    color: '#C4A0E5',
     tools: [
       { name: 'Dynamic Themes', desc: 'Multi-palette support' },
       { name: 'Responsive Design', desc: 'Mobile-first approach' },
-      { name: 'Translucent Effects', desc: 'Glass & soft UI patterns' }
-    ]
-  }
+      { name: 'Translucent Effects', desc: 'Glass & soft UI patterns' },
+    ],
+  },
 ]
 
 const linuxCategories = [
   {
     name: 'Window Manager',
     icon: Terminal,
-    color: '#06b6d4',
+    color: '#E8915A',
     tools: [
       { name: 'Hyprland', desc: 'Modern Wayland WM' },
       { name: 'Matugen', desc: 'Auto-generated color schemes' },
-      { name: 'Quickshell', desc: 'Custom bar & widgets' }
-    ]
+      { name: 'Quickshell', desc: 'Custom bar & widgets' },
+    ],
   },
   {
     name: 'Terminal & Tools',
     icon: Code2,
-    color: '#3b82f6',
+    color: '#8B5CF6',
     tools: [
       { name: 'Kitty', desc: 'GPU-based terminal' },
       { name: 'Zsh', desc: 'Shell configuration' },
       { name: 'Neovim (LazyVim)', desc: 'Text editor setup' },
-      { name: 'Yazi', desc: 'Terminal file manager' }
-    ]
+      { name: 'Yazi', desc: 'Terminal file manager' },
+    ],
   },
   {
     name: 'Applications',
     icon: Palette,
-    color: '#a855f7',
+    color: '#A78BFA',
     tools: [
       { name: 'Rofi', desc: 'App launcher & menus' },
       { name: 'Hyprlock', desc: 'Lock screen' },
       { name: 'Zen Browser', desc: 'Web browser' },
-      { name: 'swww + btop + cava', desc: 'Wallpaper, monitoring, audio viz' }
-    ]
-  }
+      { name: 'swww + btop + cava', desc: 'Wallpaper, monitoring, audio viz' },
+    ],
+  },
 ]
 
 export default function Setup() {
   const [activeTab, setActiveTab] = useState('web')
-  const [progress, setProgress] = useState(1)
-  const [tabTween, setTabTween] = useState(1)
-  const [simpleMotion, setSimpleMotion] = useState(false)
-  const sectionRef = useRef(null)
-  const [inView, setInView] = useState(false)
   const categories = activeTab === 'web' ? webCategories : linuxCategories
 
-  useEffect(() => {
-    const simple =
-      (typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches) ||
-      (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-
-    setSimpleMotion(simple)
-    if (simple) {
-      setProgress(1)
-      setTabTween(1)
-    }
-  }, [])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const el = sectionRef.current
-      if (!el) return
-      const rect = el.getBoundingClientRect()
-      const vh = window.innerHeight
-      const total = Math.max(rect.height - vh * 0.6, 1)
-      const offset = Math.min(Math.max(vh * 0.5 - rect.top, 0), total)
-      setProgress(offset / total)
-    }
-
-    handleScroll()
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', handleScroll)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleScroll)
-    }
-  }, [])
-
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.2 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (inView) {
-      setProgress(1)
-      setTabTween(1)
-    }
-  }, [inView])
-
-  // simple tween on tab change to animate content entrance
-  useEffect(() => {
-    let raf
-    const start = performance.now()
-    const duration = 280
-    const tick = (now) => {
-      const t = Math.min((now - start) / duration, 1)
-      setTabTween(t)
-      if (t < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [activeTab])
-
   return (
-    <section
-      id="setup"
-      className="py-24 sm:py-40 scroll-tell"
-      ref={sectionRef}
-      style={{ '--scroll-p': progress }}
-      data-active={inView}
-    >
-      <div className="scroll-tell-shell">
-        <div className="scroll-tell-stage">
-          <div className="flex items-center justify-between gap-6 mb-10 flex-wrap">
-            <h2 className="text-3xl sm:text-4xl font-black" style={{
-              backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>
-              Setup
-            </h2>
-            <div className="inline-flex items-center gap-2 px-3 py-2 smart-glass" style={{ borderRadius: '12px' }}>
-              <Zap size={16} style={{ color: 'rgb(var(--theme-primary))' }} />
-              <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Tools & Tech</span>
-            </div>
-          </div>
+    <section id="setup" className="py-20 sm:py-32 max-w-5xl mx-auto px-6 sm:px-8">
+      {/* Header */}
+      <motion.div
+        className="flex items-end justify-between gap-6 mb-12 flex-wrap"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-3">Stack</p>
+          <h2 className="text-4xl sm:text-5xl font-black heading-accent">Setup</h2>
+        </div>
+        <div className="flex gap-2">
+          {['web', 'linux'].map((tab) => {
+            const isActive = tab === activeTab
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-300 border"
+                style={{
+                  backgroundColor: isActive ? 'var(--accent-soft)' : 'transparent',
+                  borderColor: isActive ? 'var(--accent)' : 'var(--border)',
+                  color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+                }}
+              >
+                {tab === 'web' ? 'Web Dev' : 'Linux Setup'}
+              </button>
+            )
+          })}
+        </div>
+      </motion.div>
 
-          <div className="inline-flex gap-4 mb-14 flex-wrap">
-            {['web', 'linux'].map((tab) => {
-              const isActive = tab === activeTab
-              const label = tab === 'web' ? 'Web Dev' : 'Linux Setup'
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className="px-4 py-2 smart-glass flex items-center gap-2 text-sm font-semibold transition-all"
-                  style={{
-                    borderRadius: '12px',
-                    backgroundColor: isActive ? 'rgba(var(--theme-primary), 0.12)' : undefined,
-                    borderColor: isActive ? 'rgba(var(--theme-primary), 0.35)' : undefined,
-                    color: isActive ? 'rgb(var(--theme-primary))' : 'var(--theme-text-body)'
-                  }}
-                >
-                  {label}
-                </button>
-              )
-            })}
-          </div>
+      {/* Cards */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          className="grid gap-6 lg:grid-cols-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.35 }}
+        >
+          {categories.map((category, idx) => {
+            const Icon = category.icon
+            return (
+              <motion.article
+                key={category.name}
+                className="glass-card p-7 flex flex-col relative overflow-hidden"
+                style={{
+                  borderColor: `${category.color}30`,
+                  backgroundImage: `linear-gradient(145deg, ${category.color}08, transparent 50%)`,
+                }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: idx * 0.08 }}
+                whileHover={{ y: -3, transition: { duration: 0.25 } }}
+              >
+                {/* Accent line */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-[2px]"
+                  style={{ background: `linear-gradient(90deg, ${category.color}, transparent)` }}
+                />
 
-          <div className="grid gap-10 sm:grid-cols-1 lg:grid-cols-3" style={{ minHeight: '420px' }}>
-            {categories.map((category, catIdx) => {
-              const Icon = category.icon
-              // Bouncy spring easing
-              const ease = (t) => {
-                const c4 = (2 * Math.PI) / 3
-                return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1
-              }
-              
-              const start = catIdx * 0.15
-              const end = start + 0.5
-              const rawT = Math.min(Math.max((progress - start) / Math.max(end - start, 0.0001), 0), 1)
-              const t = ease(rawT)
-              const blended = simpleMotion ? 1 : Math.min(1, t * 0.8 + tabTween * 0.4)
-              
-              // Staggered cascade from different directions
-              const directions = [[-1, -1], [0, 1], [1, -1]]
-              const [dirX, dirY] = directions[catIdx % 3]
-              const translateX = simpleMotion ? 0 : 50 * (1 - blended) * dirX
-              const translateY = simpleMotion ? 0 : 70 * (1 - blended) * (dirY === 0 ? 1 : dirY)
-              const rotate = simpleMotion ? 0 : 6 * (1 - blended) * dirX
-              const scale = simpleMotion ? 1 : 0.8 + 0.2 * blended
-              const opacity = simpleMotion ? 1 : blended
+                <div className="flex items-center gap-3 mb-6">
+                  <div
+                    className="p-2.5 rounded-xl"
+                    style={{ backgroundColor: `${category.color}15`, color: category.color }}
+                  >
+                    <Icon size={20} />
+                  </div>
+                  <h3 className="text-lg font-black text-[var(--text)]">{category.name}</h3>
+                </div>
 
-              return (
-                <article
-                  key={category.name}
-                  className="smart-glass p-6 sm:p-7 flex flex-col card-accent"
-                  style={{
-                    ['--card-transform']: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
-                    opacity,
-                    transition: 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
-                    borderRadius: '18px',
-                    borderColor: `${category.color}33`,
-                    background: 'var(--theme-card-bg)',
-                    backgroundImage: `linear-gradient(130deg, ${category.color}18, ${category.color}05 45%, transparent 70%)`,
-                    boxShadow: `0 12px 36px -18px ${category.color}77`,
-                    ['--card-shadow']: `${category.color}99`,
-                    ['--card-color']: category.color,
-                    ['--card-color-soft']: `${category.color}22`
-                  }}
-                >
-                  <div className="flex items-center gap-3 mb-6">
+                <div className="space-y-2.5">
+                  {category.tools.map((tool) => (
                     <div
-                      className="p-3 rounded-xl flex items-center justify-center flex-shrink-0"
+                      key={tool.name}
+                      className="p-3 rounded-lg flex flex-col transition-transform duration-300 hover:translate-x-1"
                       style={{
-                        backgroundColor: `${category.color}1a`,
-                        color: category.color,
+                        backgroundColor: `${category.color}06`,
+                        borderLeft: `3px solid ${category.color}40`,
                       }}
                     >
-                      <Icon size={20} />
+                      <div className="font-semibold text-sm text-[var(--text)]">{tool.name}</div>
+                      <div className="text-xs text-[var(--text-muted)]">{tool.desc}</div>
                     </div>
-                    <h3 className="text-lg font-black text-[var(--theme-text-title)]">
-                      {category.name}
-                    </h3>
-                  </div>
-
-                  <div className="space-y-3">
-                    {category.tools.map((tool) => (
-                      <div
-                        key={tool.name}
-                        className="p-3 rounded-lg flex flex-col"
-                        style={{
-                          backgroundColor: `${category.color}08`,
-                          borderLeft: `3px solid ${category.color}`,
-                        }}
-                      >
-                        <div className="font-semibold text-sm text-[var(--theme-text-title)]">
-                          {tool.name}
-                        </div>
-                        <div className="text-xs text-[var(--theme-text-muted)]">
-                          {tool.desc}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </article>
-              )
-            })}
-          </div>
-        </div>
-      </div>
+                  ))}
+                </div>
+              </motion.article>
+            )
+          })}
+        </motion.div>
+      </AnimatePresence>
     </section>
   )
 }

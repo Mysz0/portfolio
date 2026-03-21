@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Github, Sparkles, LayoutGrid, Wrench, Archive } from 'lucide-react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Github, Sparkles, Wrench, Archive } from 'lucide-react'
 
 const tabs = [
   {
     id: 'featured',
-    label: 'Featured Builds',
+    label: 'Featured',
     icon: Sparkles,
     items: [
       {
@@ -13,7 +14,7 @@ const tabs = [
         tech: ['React 19', 'Vite', 'Tailwind', 'Theme Engine'],
         link: 'https://github.com/Mysz0/urbanradar',
         year: '2025/2026',
-        color: '#10b981'
+        color: '#8B5CF6',
       },
       {
         title: 'Orzechowce Sanctuary',
@@ -21,9 +22,9 @@ const tabs = [
         tech: ['Next.js 14', 'TypeScript', 'Supabase', 'Tailwind'],
         link: 'https://github.com/Mysz0/Orzechowce',
         year: '2026',
-        color: '#f97316'
-      }
-    ]
+        color: '#E8915A',
+      },
+    ],
   },
   {
     id: 'tools',
@@ -36,136 +37,54 @@ const tabs = [
         tech: ['Firebase', 'Firestore', 'Vanilla JS'],
         link: 'https://github.com/Mysz0/qrcode_generator',
         year: '2024',
-        color: '#8b5cf6'
-      }
-    ]
+        color: '#A78BFA',
+      },
+    ],
   },
   {
     id: 'legacy',
-    label: 'Legacy / Offline',
+    label: 'Legacy',
     icon: Archive,
     items: [
       {
         title: 'Minecraft Blocks Recipes',
-        desc: 'Searchable recipes site for Minecraft items using MariaDB + vanilla HTML/CSS UI (Aug–Nov 2024).',
+        desc: 'Searchable recipes site for Minecraft items using MariaDB + vanilla HTML/CSS UI.',
         tech: ['MariaDB', 'HTML', 'CSS'],
         link: '#',
         year: '2024',
-        color: '#22c55e'
+        color: '#7BA886',
       },
       {
         title: 'Send Files',
-        desc: 'Upload files and share a download URL. Static front-end; backend service formerly generated short links.',
+        desc: 'Upload files and share a download URL. Static front-end with short link generation.',
         tech: ['HTML', 'CSS'],
         link: '#',
         year: '2024',
-        color: '#f59e0b'
-      }
-    ]
-  }
+        color: '#C4A0E5',
+      },
+    ],
+  },
 ]
 
 export default function Projects() {
   const [active, setActive] = useState('featured')
-  const [tabTween, setTabTween] = useState(1)
-  const [progress, setProgress] = useState(1)
-  const [simpleMotion, setSimpleMotion] = useState(false)
-  const sectionRef = useRef(null)
-  const [inView, setInView] = useState(false)
-  const activeTab = tabs.find(t => t.id === active) ?? tabs[0]
-
-  useEffect(() => {
-    const simple =
-      (typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches) ||
-      (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-
-    setSimpleMotion(simple)
-    if (simple) {
-      setProgress(1)
-      setTabTween(1)
-    }
-  }, [])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const el = sectionRef.current
-      if (!el) return
-      const rect = el.getBoundingClientRect()
-      const vh = window.innerHeight
-      const total = Math.max(rect.height - vh * 0.6, 1)
-      const offset = Math.min(Math.max(vh * 0.5 - rect.top, 0), total)
-      setProgress(offset / total)
-    }
-
-    handleScroll()
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', handleScroll)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleScroll)
-    }
-  }, [])
-
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.2 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (inView) {
-      setProgress(1)
-      setTabTween(1)
-    }
-  }, [inView])
-
-  const spring = (value, factor = 1) => value * factor
-
-  // lightweight tween to drive tab content entrance
-  useEffect(() => {
-    let raf
-    const start = performance.now()
-    const duration = 280
-    const tick = (now) => {
-      const t = Math.min((now - start) / duration, 1)
-      setTabTween(t)
-      if (t < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [active])
+  const activeTab = tabs.find((t) => t.id === active) ?? tabs[0]
 
   return (
-    <section
-      id="projects"
-      className="py-24 sm:py-40 scroll-tell"
-      ref={sectionRef}
-      style={{ '--scroll-p': progress }}
-      data-active={inView}
-    >
-      <div className="scroll-tell-shell">
-        <div className="scroll-tell-stage">
-        <div className="flex items-center justify-between gap-6 mb-10 flex-wrap">
-          <h2 className="text-3xl sm:text-4xl font-black" style={{
-            backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>
-            Builds
-          </h2>
-          <div className="inline-flex items-center gap-2 px-3 py-2 smart-glass" style={{ borderRadius: '12px' }}>
-            <LayoutGrid size={16} style={{ color: 'rgb(var(--theme-primary))' }} />
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Modular & Themed</span>
-          </div>
+    <section id="projects" className="py-20 sm:py-32 max-w-5xl mx-auto px-6 sm:px-8">
+      {/* Header */}
+      <motion.div
+        className="flex items-end justify-between gap-6 mb-12 flex-wrap"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-3">Portfolio</p>
+          <h2 className="text-4xl sm:text-5xl font-black heading-accent">Builds</h2>
         </div>
-
-        <div className="inline-flex gap-4 mb-14 flex-wrap">
+        <div className="flex gap-2">
           {tabs.map((tab) => {
             const Icon = tab.icon
             const isActive = tab.id === active
@@ -173,12 +92,11 @@ export default function Projects() {
               <button
                 key={tab.id}
                 onClick={() => setActive(tab.id)}
-                className="px-4 py-2 smart-glass flex items-center gap-2 text-sm font-semibold transition-all"
+                className="px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm font-semibold transition-colors duration-300 border"
                 style={{
-                  borderRadius: '12px',
-                  backgroundColor: isActive ? 'rgba(var(--theme-primary), 0.12)' : undefined,
-                  borderColor: isActive ? 'rgba(var(--theme-primary), 0.35)' : undefined,
-                  color: isActive ? 'rgb(var(--theme-primary))' : 'var(--theme-text-body)'
+                  backgroundColor: isActive ? 'var(--accent-soft)' : 'transparent',
+                  borderColor: isActive ? 'var(--accent)' : 'var(--border)',
+                  color: isActive ? 'var(--accent)' : 'var(--text-muted)',
                 }}
               >
                 <Icon size={14} />
@@ -187,108 +105,85 @@ export default function Projects() {
             )
           })}
         </div>
+      </motion.div>
 
-        <div className="grid gap-10 sm:grid-cols-1 lg:grid-cols-2" style={{ minHeight: '420px' }}>
-          {activeTab.items.map((p, idx) => {
-            // Dramatic spring easing
-            const ease = (t) => {
-              const c4 = (2 * Math.PI) / 3
-              return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1
-            }
-            
-            const start = idx * 0.18
-            const end = start + 0.55
-            const rawT = Math.min(Math.max((progress - start) / Math.max(end - start, 0.0001), 0), 1)
-            const t = ease(rawT)
-            const blended = simpleMotion ? 1 : Math.min(1, t * 0.8 + tabTween * 0.4)
-            
-            const dir = idx % 2 === 0 ? -1 : 1
-            const translateX = simpleMotion ? 0 : 60 * (1 - blended) * dir
-            const translateY = simpleMotion ? 0 : 80 * (1 - blended)
-            const rotate = simpleMotion ? 0 : 8 * (1 - blended) * dir
-            const scale = simpleMotion ? 1 : 0.85 + 0.15 * blended
-            const opacity = simpleMotion ? 1 : blended
+      {/* Cards */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={active}
+          className="grid gap-6 lg:grid-cols-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.35 }}
+        >
+          {activeTab.items.map((p, idx) => (
+            <motion.article
+              key={p.title}
+              className="glass-card p-7 flex flex-col relative overflow-hidden group"
+              style={{
+                borderColor: `${p.color}30`,
+                backgroundImage: `linear-gradient(145deg, ${p.color}08, transparent 50%)`,
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: idx * 0.08 }}
+              whileHover={{ y: -4, transition: { duration: 0.25 } }}
+            >
+              {/* Accent line top */}
+              <div
+                className="absolute top-0 left-0 right-0 h-[2px]"
+                style={{ background: `linear-gradient(90deg, ${p.color}, transparent)` }}
+              />
 
-            return (
-              <article 
-                key={p.title} 
-                className="smart-glass p-6 sm:p-7 flex flex-col card-accent"
-                style={{
-                  ['--card-transform']: `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
-                  opacity,
-                  transition: 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out',
-                  borderRadius: '18px',
-                  borderColor: `${p.color}33`,
-                  background: 'var(--theme-card-bg)',
-                  backgroundImage: `linear-gradient(130deg, ${p.color}18, ${p.color}05 45%, transparent 70%)`,
-                  boxShadow: `0 12px 36px -18px ${p.color}77`,
-                  overflow: 'hidden',
-                  position: 'relative',
-                  ['--card-shadow']: `${p.color}99`,
-                  ['--card-color']: p.color,
-                  ['--card-color-soft']: `${p.color}22`
-                }}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div 
-                    className="px-3 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+              <div className="flex items-start justify-between mb-5">
+                <div
+                  className="px-3 py-1.5 rounded-lg text-xs font-black"
+                  style={{ backgroundColor: `${p.color}15`, color: p.color }}
+                >
+                  {p.year}
+                </div>
+              </div>
+
+              <h3 className="text-2xl font-black mb-3 text-[var(--text)]">{p.title}</h3>
+              <p className="text-[var(--text-muted)] mb-6 leading-relaxed">{p.desc}</p>
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                {p.tech.map((t) => (
+                  <span
+                    key={t}
+                    className="text-xs font-semibold px-3 py-1 rounded-full"
                     style={{
-                      backgroundColor: `${p.color}1a`,
+                      backgroundColor: `${p.color}0c`,
                       color: p.color,
-                      boxShadow: `0 10px 28px -14px ${p.color}99`
+                      border: `1px solid ${p.color}25`,
                     }}
                   >
-                    <span className="text-xs font-black whitespace-nowrap">{p.year}</span>
-                  </div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--theme-text-muted)]">{activeTab.label}</span>
-                </div>
-
-                <h3 className="text-xl font-black mb-2 text-[var(--theme-text-title)]" style={{ lineHeight: 1.2 }}>
-                  {p.title}
-                </h3>
-                <p className="text-[var(--theme-text-muted)] mb-5 leading-relaxed">
-                  {p.desc}
-                </p>
-
-                <div className="flex flex-wrap gap-2 mb-5">
-                  {p.tech.map((t) => (
-                    <span 
-                      key={t}
-                      className="text-xs font-semibold px-3 py-1"
-                      style={{
-                        backgroundColor: `${p.color}12`,
-                        color: p.color,
-                        borderRadius: '999px',
-                        border: `1px solid ${p.color}33`
-                      }}
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
-                {p.link && p.link !== '#' ? (
-                  <a 
-                    href={p.link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 font-black text-sm uppercase tracking-wider mt-auto pt-4 link-accent"
-                    style={{ color: p.color }}
-                  >
-                    <Github size={16} />
-                    View on GitHub
-                  </a>
-                ) : (
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[var(--theme-text-muted)] mt-auto pt-4">
-                    Offline / No repo
+                    {t}
                   </span>
-                )}
-              </article>
-            )
-          })}
-        </div>
-        </div>
-      </div>
+                ))}
+              </div>
+
+              {p.link && p.link !== '#' ? (
+                <a
+                  href={p.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-bold text-sm mt-auto transition-all duration-300 hover:gap-3"
+                  style={{ color: p.color }}
+                >
+                  <Github size={16} />
+                  View on GitHub
+                </a>
+              ) : (
+                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mt-auto">
+                  Offline / No repo
+                </span>
+              )}
+            </motion.article>
+          ))}
+        </motion.div>
+      </AnimatePresence>
     </section>
   )
 }

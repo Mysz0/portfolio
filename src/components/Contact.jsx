@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Send } from 'lucide-react'
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
@@ -14,70 +16,67 @@ export default function Contact() {
   }
 
   return (
-    <section
-      id="contact"
-      className="py-12 sm:py-16"
-      style={{ animation: 'fadeInUp 0.8s ease-out both' }}
-    >
-      <div
-        className="smart-glass p-8 sm:p-12 anim-soft-card"
-        style={{ borderRadius: '20px' }}
+    <section id="contact" className="py-20 sm:py-32 max-w-5xl mx-auto px-6 sm:px-8">
+      <motion.div
+        className="glass-card p-8 sm:p-14 relative overflow-hidden"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       >
-        <h2 className="text-3xl sm:text-4xl font-black mb-3" style={{
-          backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}>
+        {/* Decorative accent */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[2px]"
+          style={{ background: 'linear-gradient(90deg, var(--accent), transparent 70%)' }}
+        />
+
+        <p className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-3">Get in Touch</p>
+        <h2 className="text-3xl sm:text-5xl font-black mb-4 heading-accent">
           Let's Connect
         </h2>
-        <p className="text-[var(--theme-text-body)] mb-8 text-lg">
-          Have a project in mind? I'd love to hear about it. Send me a message and I'll get back to you as soon as possible.
+        <p className="text-[var(--text-body)] mb-10 text-lg max-w-xl">
+          Have a project in mind? Send me a message and I'll get back to you.
         </p>
         <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
-          <input 
+          <input
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="p-4 smart-glass text-[var(--theme-text-title)]" 
-            placeholder="Name" 
+            className="p-4 rounded-xl"
+            placeholder="Name"
             type="text"
-            style={{ borderRadius: '12px' }}
             required
           />
-          <input 
+          <input
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="p-4 smart-glass text-[var(--theme-text-title)]" 
-            placeholder="Email" 
+            className="p-4 rounded-xl"
+            placeholder="Email"
             type="email"
-            style={{ borderRadius: '12px' }}
             required
           />
-          <textarea 
+          <textarea
             name="message"
             value={formData.message}
             onChange={handleChange}
-            className="p-4 smart-glass text-[var(--theme-text-title)] sm:col-span-2 resize-none" 
-            rows="4" 
+            className="p-4 rounded-xl sm:col-span-2 resize-none"
+            rows="4"
             placeholder="Your message..."
-            style={{ borderRadius: '12px' }}
             required
           />
-          <button 
-            type="submit" 
-            className="sm:col-span-2 px-6 py-4 font-black uppercase tracking-wider text-white transition-all duration-300 hover:shadow-lg hover:scale-105"
-            style={{
-              backgroundColor: 'rgb(var(--theme-primary))',
-              border: '1px solid rgba(var(--theme-primary), 0.3)',
-              borderRadius: '12px',
-            }}
+          <motion.button
+            type="submit"
+            className="sm:col-span-2 px-6 py-4 font-bold text-white rounded-xl flex items-center justify-center gap-2 transition-colors duration-300"
+            style={{ backgroundColor: 'var(--accent)' }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
+            <Send size={18} />
             Send Message
-          </button>
+          </motion.button>
         </form>
-      </div>
+      </motion.div>
     </section>
   )
 }

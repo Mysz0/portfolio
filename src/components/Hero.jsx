@@ -1,64 +1,122 @@
-import React from 'react'
-import { ChevronDown, Sparkles } from 'lucide-react'
+import { useRef } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+
+const projects = [
+  { name: 'Urban Radar', year: '2025/2026', color: '#8B5CF6' },
+  { name: 'Orzechowce Sanctuary', year: '2026', color: '#E8915A' },
+  { name: 'QR Code Generator', year: '2024', color: '#A78BFA' },
+]
 
 export default function Hero() {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end start'],
+  })
+  const y = useTransform(scrollYProgress, [0, 1], [0, 150])
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
+
   return (
-    <header className="py-16 sm:py-28" style={{ animation: 'fadeInUp 0.8s ease-out' }}>
-      <div className="max-w-5xl mx-auto grid gap-10 sm:gap-12 md:grid-cols-[1.2fr_0.8fr] items-center">
-        <div>
-          <div className="mb-4 inline-flex items-center gap-2 px-4 py-2 smart-glass" style={{ borderRadius: '999px' }}>
-            <Sparkles size={16} style={{ color: 'rgb(var(--theme-primary))' }} />
-            <span className="text-xs font-black uppercase tracking-[0.24em] text-[var(--theme-text-muted)]">Product UI & Theming</span>
-          </div>
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-4" style={{
-            backgroundImage: 'linear-gradient(135deg, rgb(var(--theme-primary)), rgba(var(--theme-primary), 0.6))',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>
-            Myszo - I build bold, themeable interfaces.
-          </h1>
-          <p className="text-base sm:text-lg text-[var(--theme-text-body)] mb-8 leading-relaxed max-w-2xl">
-            React developer focused on dynamic theme systems, glass-morphism, and performance. Less fluff, more polish: sharp layouts, motion that guides, and code that ships.
-          </p>
-          <div className="flex items-center gap-3 flex-wrap">
-            <a href="#projects" className="px-6 py-3 smart-glass font-semibold text-white" style={{
-              backgroundColor: 'rgb(var(--theme-primary))',
-              border: '1px solid rgba(var(--theme-primary), 0.3)',
-              borderRadius: '12px',
-            }}>
-              See Projects
-            </a>
-            <a href="#contact" className="px-6 py-3 smart-glass font-semibold" style={{
-              color: 'rgb(var(--theme-primary))',
-              borderRadius: '12px',
-            }}>
-              Email Me
-            </a>
-          </div>
+    <header ref={ref} className="relative z-10 min-h-screen flex items-center">
+      <motion.div style={{ y, opacity }} className="w-full max-w-5xl mx-auto px-6 sm:px-8">
+        {/* Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="mb-8"
+        >
+          <span className="inline-flex items-center gap-2 px-4 py-2 glass-card rounded-full text-xs font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">
+            <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse" />
+            Product UI & Theming
+          </span>
+        </motion.div>
+
+        {/* Main heading — large, bold, staggered lines */}
+        <div className="mb-8 space-y-1">
+          {['Myszo.', 'I build bold,', 'themeable interfaces.'].map((line, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -60, filter: 'blur(12px)' }}
+              animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+              transition={{ duration: 0.9, delay: 0.2 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <h1
+                className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.95]"
+                style={i === 0 ? {
+                  backgroundImage: 'linear-gradient(135deg, var(--accent), var(--accent-deep))',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                } : undefined}
+              >
+                {line}
+              </h1>
+            </motion.div>
+          ))}
         </div>
 
-        <div className="smart-glass p-5 sm:p-6" style={{ borderRadius: '18px' }}>
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-black uppercase tracking-widest text-[var(--theme-text-muted)]">Now Shipping</span>
-            <ChevronDown size={16} className="animate-bounce" style={{ animationDuration: '2s', color: 'rgb(var(--theme-primary))' }} />
-          </div>
-          <ul className="space-y-3 text-sm text-[var(--theme-text-body)]">
-            <li className="flex justify-between">
-              <span>Urban Radar</span>
-              <span className="font-semibold" style={{ color: 'rgb(var(--theme-primary))' }}>2025/2026</span>
-            </li>
-            <li className="flex justify-between">
-              <span>Orzechowce Sanctuary</span>
-              <span className="font-semibold" style={{ color: 'rgb(var(--theme-primary))' }}>2026</span>
-            </li>
-            <li className="flex justify-between">
-              <span>QR Code Generator</span>
-              <span className="font-semibold" style={{ color: 'rgb(var(--theme-primary))' }}>2024</span>
-            </li>
-          </ul>
-        </div>
-      </div>
+        {/* Tagline */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.6 }}
+          className="text-lg sm:text-xl text-[var(--text-body)] mb-12 leading-relaxed max-w-2xl"
+        >
+          React developer focused on dynamic theme systems, glass-morphism, and performance.
+          Sharp layouts, motion that guides, and code that ships.
+        </motion.p>
+
+        {/* CTA buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.75 }}
+          className="flex items-center gap-4 flex-wrap mb-16"
+        >
+          <a
+            href="#projects"
+            className="group relative px-8 py-4 rounded-2xl font-bold text-white overflow-hidden transition-transform duration-300 hover:scale-105 active:scale-95"
+            style={{ backgroundColor: 'var(--accent)' }}
+          >
+            <span className="relative z-10">See Projects</span>
+          </a>
+          <a
+            href="#contact"
+            className="px-8 py-4 rounded-2xl font-bold glass-card transition-transform duration-300 hover:scale-105 active:scale-95"
+            style={{ color: 'var(--accent)' }}
+          >
+            Email Me
+          </a>
+        </motion.div>
+
+        {/* Floating project pills */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.9 }}
+          className="flex flex-wrap gap-3"
+        >
+          {projects.map((p, i) => (
+            <motion.div
+              key={p.name}
+              className="glass-card px-4 py-2.5 rounded-full flex items-center gap-3 text-sm"
+              animate={{ y: [0, -8, 0] }}
+              transition={{
+                duration: 3.5 + i * 0.4,
+                repeat: Infinity,
+                delay: i * 0.6,
+                ease: 'easeInOut',
+              }}
+            >
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
+              <span className="font-medium text-[var(--text)]">{p.name}</span>
+              <span className="text-[var(--text-muted)] text-xs font-mono">{p.year}</span>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
+
     </header>
   )
 }
