@@ -24,12 +24,6 @@ export default function Contact() {
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       >
-        {/* Decorative accent */}
-        <div
-          className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{ background: 'linear-gradient(90deg, var(--accent), transparent 70%)' }}
-        />
-
         <p className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-3">Get in Touch</p>
         <h2 className="text-3xl sm:text-5xl font-black mb-4 heading-accent">
           Let's Connect

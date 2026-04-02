@@ -85,7 +85,7 @@ const fragmentShader = `
     float vig=1.-length((vUv-.5)*1.4);
     vig=smoothstep(0.,.7,vig);
 
-    gl_FragColor=vec4(col,vig*.3);
+    gl_FragColor=vec4(col,vig*.55);
   }
 `
 

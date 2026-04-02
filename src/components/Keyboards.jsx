@@ -64,12 +64,6 @@ export default function Keyboards() {
             transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
             whileHover={{ y: -4, transition: { duration: 0.25 } }}
           >
-            {/* Accent line */}
-            <div
-              className="absolute top-0 left-0 right-0 h-[2px]"
-              style={{ background: `linear-gradient(90deg, ${kb.color}, transparent)` }}
-            />
-
             <div className="flex items-start justify-between mb-5">
               <div
                 className="px-3 py-1.5 rounded-lg text-xs font-black"

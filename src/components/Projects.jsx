@@ -130,12 +130,6 @@ export default function Projects() {
               transition={{ duration: 0.4, delay: idx * 0.08 }}
               whileHover={{ y: -4, transition: { duration: 0.25 } }}
             >
-              {/* Accent line top */}
-              <div
-                className="absolute top-0 left-0 right-0 h-[2px]"
-                style={{ background: `linear-gradient(90deg, ${p.color}, transparent)` }}
-              />
-
               <div className="flex items-start justify-between mb-5">
                 <div
                   className="px-3 py-1.5 rounded-lg text-xs font-black"

@@ -135,12 +135,6 @@ export default function Setup() {
                 transition={{ duration: 0.4, delay: idx * 0.08 }}
                 whileHover={{ y: -3, transition: { duration: 0.25 } }}
               >
-                {/* Accent line */}
-                <div
-                  className="absolute top-0 left-0 right-0 h-[2px]"
-                  style={{ background: `linear-gradient(90deg, ${category.color}, transparent)` }}
-                />
-
                 <div className="flex items-center gap-3 mb-6">
                   <div
                     className="p-2.5 rounded-xl"

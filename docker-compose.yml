@@ -1,0 +1,14 @@
+services:
+  portfolio:
+    build: .
+    container_name: portfolio
+    restart: unless-stopped
+    ports:
+      - "3007:5173"
+    networks:
+      - homelab-net
+
+
+networks:
+  homelab-net:
+    external: true

@@ -64,6 +64,12 @@
   --accent-hover: rgba(139, 92, 246, 0.18);
   --particle-color: 139, 92, 246;
   --grid-color: rgba(139, 92, 246, 0.06);
+  --grid-dot-bright: rgba(139, 92, 246, 0.18);
+  --ambient-glow: rgba(139, 92, 246, 0.04);
+  --card-glow-1: rgba(139, 92, 246, 0.08);
+  --card-glow-2: rgba(139, 92, 246, 0.05);
+  --card-glow-3: rgba(139, 92, 246, 0.025);
+  --card-glow-4: rgba(139, 92, 246, 0.01);
   color-scheme: light;
 }
 
@@ -82,6 +88,12 @@
   --accent-hover: rgba(167, 139, 250, 0.18);
   --particle-color: 167, 139, 250;
   --grid-color: rgba(167, 139, 250, 0.05);
+  --grid-dot-bright: rgba(167, 139, 250, 0.15);
+  --ambient-glow: rgba(167, 139, 250, 0.035);
+  --card-glow-1: rgba(255, 255, 255, 0.1);
+  --card-glow-2: rgba(255, 255, 255, 0.06);
+  --card-glow-3: rgba(255, 255, 255, 0.03);
+  --card-glow-4: rgba(255, 255, 255, 0.01);
   color-scheme: dark;
 }
 
@@ -106,18 +118,85 @@ body {
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-/* ============ DOT GRID OVERLAY ============ */
+/* ============ DOT GRID OVERLAY (notebook pattern + cursor reveal) ============ */
 
-.dot-grid::after {
+/* Base dots visible everywhere */
+.dot-grid::before {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 1;
   background-image: radial-gradient(circle, var(--grid-color) 1px, transparent 1px);
-  background-size: 24px 24px;
-  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 100%);
+  background-size: 28px 28px;
+}
+
+/* Brighter dots revealed by cursor proximity */
+.dot-grid::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: radial-gradient(circle, var(--grid-dot-bright) 1px, transparent 1px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(
+    350px circle at var(--cursor-x, -1000px) var(--cursor-y, -1000px),
+    black 0%,
+    rgba(0,0,0,0.5) 50%,
+    transparent 80%
+  );
+  mask-image: radial-gradient(
+    350px circle at var(--cursor-x, -1000px) var(--cursor-y, -1000px),
+    black 0%,
+    rgba(0,0,0,0.5) 50%,
+    transparent 80%
+  );
+}
+
+/* ============ AMBIENT CURSOR LIGHT ============ */
+
+.ambient-light {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    350px circle at var(--cursor-x, 50vw) var(--cursor-y, 50vh),
+    var(--ambient-glow) 0%,
+    transparent 75%
+  );
+  will-change: background;
+}
+
+/* ============ GLASS CARD MOUSE HIGHLIGHT ============ */
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    var(--card-glow-1) 0%,
+    var(--card-glow-2) 15%,
+    var(--card-glow-3) 30%,
+    var(--card-glow-4) 50%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+.glass-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* ============ NOISE OVERLAY ============ */
