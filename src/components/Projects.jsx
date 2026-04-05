@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Github, Sparkles, Wrench, Archive } from 'lucide-react'
+import { Github, Sparkles, Wrench, Archive, Globe } from 'lucide-react'
 
 const tabs = [
   {
@@ -17,10 +17,10 @@ const tabs = [
         color: '#8B5CF6',
       },
       {
-        title: 'Orzechowce Sanctuary',
-        desc: 'Adoption platform with admin tools, Supabase backend, responsive cards, and smooth filters for pets.',
-        tech: ['Next.js 14', 'TypeScript', 'Supabase', 'Tailwind'],
-        link: 'https://github.com/Mysz0/Orzechowce',
+        title: 'Portfolio',
+        desc: 'Personal portfolio site showcasing projects and contact info.',
+        tech: ['Vite', 'React', 'Tailwind'],
+        link: 'https://me.hyruki.cc',
         year: '2026',
         color: '#E8915A',
       },
@@ -32,13 +32,22 @@ const tabs = [
     icon: Wrench,
     items: [
       {
-        title: 'QR Code Generator',
-        desc: 'Real-time QR generation with Firebase auth, stored codes, and animated particles on the canvas.',
-        tech: ['Firebase', 'Firestore', 'Vanilla JS'],
-        link: 'https://github.com/Mysz0/qrcode_generator',
-        year: '2024',
+        title: 'Tools',
+        desc: 'Set of tools including a QR code generator, password generator, json formatter and diff checker.',
+        tech: ['React', 'Bun', 'ShadCN UI', 'Tailwind'],
+        link: 'https://tools.hyruki.cc',
+        year: '2026',
         color: '#A78BFA',
       },
+      {
+        title: 'Tech stack configurator',
+        desc: 'A tool to pick your tech stack and generate the setup commands for your development environment.',
+        tech: ['React', 'Bun', 'ShadCN UI', 'Tailwind'],
+        link: 'https://tech.hyruki.cc',
+        year: '2026',
+        color: '#A78BFA',
+      },
+      
     ],
   },
   {
@@ -61,6 +70,14 @@ const tabs = [
         link: '#',
         year: '2024',
         color: '#C4A0E5',
+      },
+      {
+        title: 'QR Code Generator',
+        desc: 'Real-time QR generation with Firebase auth, stored codes, and animated particles on the canvas.',
+        tech: ['Firebase', 'Firestore', 'Vanilla JS'],
+        link: 'https://github.com/Mysz0/qrcode_generator',
+        year: '2024',
+        color: '#A78BFA',
       },
     ],
   },
@@ -166,8 +183,8 @@ export default function Projects() {
                   className="inline-flex items-center gap-2 font-bold text-sm mt-auto transition-all duration-300 hover:gap-3"
                   style={{ color: p.color }}
                 >
-                  <Github size={16} />
-                  View on GitHub
+                  {p.link.includes('github.com') ? <Github size={16} /> : <Globe size={16} />}
+                  {p.link.includes('github.com') ? 'View on GitHub' : 'View page'}
                 </a>
               ) : (
                 <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mt-auto">
