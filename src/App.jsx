@@ -1,5 +1,6 @@
-import { useState, useEffect, useLayoutEffect, Suspense, lazy } from 'react'
-import { useMotionValue, useSpring } from 'framer-motion'
+import { Suspense, lazy, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import Lenis from 'lenis'
 import Hero from './components/Hero'
 import About from './components/About'
 import Projects from './components/Projects'
@@ -7,131 +8,88 @@ import Setup from './components/Setup'
 import Keyboards from './components/Keyboards'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
-import ThemeToggle from './components/ThemeToggle'
-import Particles from './components/Particles'
 
 const ShaderBackground = lazy(() => import('./components/ShaderBackground'))
 
-function useGlassCardMouseTracking() {
+const RevealSection = ({ children, delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
+    whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+    viewport={{ once: false, amount: 0.2 }}
+    transition={{ duration: 1.2, delay, ease: [0.22, 1, 0.36, 1] }}
+  >
+    {children}
+  </motion.div>
+)
+
+const Interstitial = ({ text }) => (
+  <RevealSection>
+    <div className="max-w-5xl mx-auto px-8 py-48 opacity-50 font-light text-center tracking-[0.5em] uppercase text-[11px] text-[var(--text-muted)]">
+      {text}
+    </div>
+  </RevealSection>
+)
+
+function SmoothScroll() {
   useEffect(() => {
-    const onMouseMove = (e) => {
-      const card = e.target.closest('.glass-card')
-      if (!card) return
-      const rect = card.getBoundingClientRect()
-      const x = ((e.clientX - rect.left) / rect.width) * 100
-      const y = ((e.clientY - rect.top) / rect.height) * 100
-      card.style.setProperty('--mouse-x', `${x}%`)
-      card.style.setProperty('--mouse-y', `${y}%`)
-    }
-    document.addEventListener('mousemove', onMouseMove, { passive: true })
-    return () => document.removeEventListener('mousemove', onMouseMove)
-  }, [])
-}
-
-function CursorTracker() {
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-  const springX = useSpring(mouseX, { stiffness: 600, damping: 50 })
-  const springY = useSpring(mouseY, { stiffness: 600, damping: 50 })
-
-  useEffect(() => {
-    let raf
-    let clientX = 0
-    let clientY = 0
-
-    const onPointerMove = (e) => {
-      if (e.pointerType !== 'mouse') return
-      clientX = e.clientX
-      clientY = e.clientY
-    }
-
-    const update = () => {
-      mouseX.set(clientX)
-      mouseY.set(clientY)
-      raf = requestAnimationFrame(update)
-    }
-
-    window.addEventListener('pointermove', onPointerMove)
-    raf = requestAnimationFrame(update)
-
-    return () => {
-      window.removeEventListener('pointermove', onPointerMove)
-      cancelAnimationFrame(raf)
-    }
-  }, [])
-
-  useEffect(() => {
-    const unsubX = springX.on('change', (v) => {
-      document.documentElement.style.setProperty('--cursor-x', `${v}px`)
+    const lenis = new Lenis({
+      duration: 1.6,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      touchMultiplier: 1.5,
     })
-    const unsubY = springY.on('change', (v) => {
-      document.documentElement.style.setProperty('--cursor-y', `${v}px`)
-    })
-    return () => { unsubX(); unsubY() }
-  }, [springX, springY])
-
+    function raf(time) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+    requestAnimationFrame(raf)
+    return () => lenis.destroy()
+  }, [])
   return null
 }
 
 export default function App() {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme-mode') === 'dark' ||
-             (!localStorage.getItem('theme-mode') && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    }
-    return true
-  })
-
-  useGlassCardMouseTracking()
-
-  useLayoutEffect(() => {
-    const root = document.documentElement
-    root.classList.toggle('dark', isDark)
-    root.style.colorScheme = isDark ? 'dark' : 'light'
-    localStorage.setItem('theme-mode', isDark ? 'dark' : 'light')
-
-    const baseColor = isDark ? '#0F0B15' : '#FAF7F2'
-    const head = document.head
-    head.querySelectorAll('meta[name="theme-color"]').forEach((el) => el.remove())
-    const meta = document.createElement('meta')
-    meta.setAttribute('name', 'theme-color')
-    meta.setAttribute('content', baseColor)
-    head.appendChild(meta)
-  }, [isDark])
-
   return (
-    <div className="relative min-h-screen bg-[var(--bg)] text-[var(--text)] transition-colors duration-500 overflow-x-hidden">
-      {/* Dot grid overlay */}
-      <div className="dot-grid fixed inset-0 pointer-events-none z-[1]" />
-      {/* Noise texture overlay */}
-      <div className="noise-overlay fixed inset-0 pointer-events-none z-[9999]" />
-      {/* Cursor tracking (ice-like spring movement) */}
-      <CursorTracker />
+    <div className="relative min-h-screen bg-[var(--bg)] text-[var(--text)] overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
+      <SmoothScroll />
 
-      {/* Ambient cursor glow */}
-      <div className="ambient-light" />
-
-      {/* WebGL shader background */}
+      {/* Atmospheric Background */}
       <Suspense fallback={null}>
-        <ShaderBackground isDark={isDark} />
+        <ShaderBackground />
       </Suspense>
 
-      {/* Floating particles */}
-      <Particles count={20} />
-
-      {/* Theme toggle */}
-      <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
-
-      {/* Content */}
-      <div className="relative z-10">
+      {/* Content - Cinematic Scroll Journey */}
+      <main className="relative z-10 space-y-0 pb-32">
         <Hero />
-        <About />
-        <Projects />
-        <Setup />
-        <Keyboards />
-        <Contact />
+        
+        <Interstitial text="The empty space is not nothing — it is everything waiting." />
+
+        <RevealSection>
+          <About />
+        </RevealSection>
+
+        <Interstitial text="Each stone placed with intention." />
+
+        <RevealSection>
+          <Projects />
+        </RevealSection>
+
+        <Interstitial text="The tools shape the hand that holds them." />
+
+        <RevealSection>
+          <Setup />
+        </RevealSection>
+
+        <RevealSection>
+          <Keyboards />
+        </RevealSection>
+
+        <RevealSection>
+          <Contact />
+        </RevealSection>
+
         <Footer />
-      </div>
+      </main>
     </div>
   )
 }

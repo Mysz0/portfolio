@@ -10,29 +10,31 @@ const links = [
 export default function Footer() {
   return (
     <motion.footer
-      className="py-16 text-center max-w-5xl mx-auto px-6 sm:px-8"
-      style={{ borderTop: '1px solid var(--border)' }}
+      className="py-32 text-center max-w-5xl mx-auto px-6 sm:px-8 border-t border-[var(--border)]"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 1.5 }}
     >
-      <div className="flex items-center justify-center gap-6 mb-6">
+      <div className="flex items-center justify-center gap-10 mb-12">
         {links.map(({ icon: Icon, label, href }) => (
           <a
             key={label}
             href={href}
             target={href.startsWith('mailto') ? undefined : '_blank'}
             rel={href.startsWith('mailto') ? undefined : 'noopener noreferrer'}
-            className="p-3 glass-card rounded-xl transition-all duration-300 hover:scale-110 hover:border-[var(--accent)]"
+            className="group relative transition-all duration-500"
             style={{ color: 'var(--text-muted)' }}
           >
-            <Icon size={18} />
+            <Icon size={20} className="group-hover:text-[var(--accent)] group-hover:scale-125 transition-all duration-500" />
+            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-500">
+              {label}
+            </span>
           </a>
         ))}
       </div>
-      <p className="text-sm text-[var(--text-muted)]">
-        © {new Date().getFullYear()} Myszo — Built with React + Vite
+      <p className="text-[10px] font-light tracking-[0.4em] text-[var(--text-muted)]">
+        © {new Date().getFullYear()} — Tended with care
       </p>
     </motion.footer>
   )

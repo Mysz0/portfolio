@@ -1,197 +1,159 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Github, Sparkles, Wrench, Archive, Globe } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import WindText from './WindText'
 
 const tabs = [
   {
     id: 'featured',
-    label: 'Featured',
-    icon: Sparkles,
+    label: 'Featured Builds',
     items: [
       {
         title: 'Urban Radar',
-        desc: 'Location-based social app with a full theme engine (Emerald, Winter, Sakura, Aurora, Blackhole) and glass-morphism UI.',
-        tech: ['React 19', 'Vite', 'Tailwind', 'Theme Engine'],
-        link: 'https://github.com/Mysz0/urbanradar',
-        year: '2025/2026',
-        color: '#8B5CF6',
+        desc: 'A location-based social ecosystem. Built with a custom real-time theme engine that morphs the entire UI between atmospheric states.',
+        tech: ['React', 'Three.js', 'Framer Motion'],
+        link: 'https://urabanradar.app',
+        year: '2025/26',
       },
       {
-        title: 'Portfolio',
-        desc: 'Personal portfolio site showcasing projects and contact info.',
-        tech: ['Vite', 'React', 'Tailwind'],
+        title: 'Digital Sanctuary',
+        desc: 'An immersive portfolio experience exploring atmospheric navigation and GPU-accelerated visuals.',
+        tech: ['Vite', 'Three.js', 'ShaderLab'],
         link: 'https://me.hyruki.cc',
         year: '2026',
-        color: '#E8915A',
       },
     ],
   },
   {
     id: 'tools',
     label: 'Utilities',
-    icon: Wrench,
     items: [
       {
-        title: 'Tools',
-        desc: 'Set of tools including a QR code generator, password generator, json formatter and diff checker.',
-        tech: ['React', 'Bun', 'ShadCN UI', 'Tailwind'],
+        title: 'Developer Core',
+        desc: 'High-performance utilities focused on speed and minimal cognitive load.',
+        tech: ['React', 'Bun', 'ShadCN'],
         link: 'https://tools.hyruki.cc',
         year: '2026',
-        color: '#A78BFA',
       },
       {
-        title: 'Tech stack configurator',
-        desc: 'A tool to pick your tech stack and generate the setup commands for your development environment.',
-        tech: ['React', 'Bun', 'ShadCN UI', 'Tailwind'],
+        title: 'Stack Config',
+        desc: 'Visual environment architect for composing development stacks and generation scripts.',
+        tech: ['React', 'Bun', 'Tailwind'],
         link: 'https://tech.hyruki.cc',
         year: '2026',
-        color: '#A78BFA',
-      },
-      
-    ],
-  },
-  {
-    id: 'legacy',
-    label: 'Legacy',
-    icon: Archive,
-    items: [
-      {
-        title: 'Minecraft Blocks Recipes',
-        desc: 'Searchable recipes site for Minecraft items using MariaDB + vanilla HTML/CSS UI.',
-        tech: ['MariaDB', 'HTML', 'CSS'],
-        link: '#',
-        year: '2024',
-        color: '#7BA886',
-      },
-      {
-        title: 'Send Files',
-        desc: 'Upload files and share a download URL. Static front-end with short link generation.',
-        tech: ['HTML', 'CSS'],
-        link: '#',
-        year: '2024',
-        color: '#C4A0E5',
-      },
-      {
-        title: 'QR Code Generator',
-        desc: 'Real-time QR generation with Firebase auth, stored codes, and animated particles on the canvas.',
-        tech: ['Firebase', 'Firestore', 'Vanilla JS'],
-        link: 'https://github.com/Mysz0/qrcode_generator',
-        year: '2024',
-        color: '#A78BFA',
       },
     ],
   },
 ]
+
+function ProjectRow({ p, idx }) {
+  const rowRef = useRef(null)
+
+  const handleMouseMove = useCallback((e) => {
+    if (!rowRef.current) return
+    const rect = rowRef.current.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width - 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5
+    rowRef.current.style.transform = `translate(${x * 6}px, ${y * 4}px)`
+  }, [])
+
+  const handleMouseLeave = useCallback(() => {
+    if (!rowRef.current) return
+    rowRef.current.style.transform = 'translate(0px, 0px)'
+  }, [])
+
+  return (
+    <div
+      ref={rowRef}
+      className="group grid md:grid-cols-12 gap-8 items-start border-b border-[var(--border)] pb-12 transition-transform duration-700"
+      style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="md:col-span-1 text-[var(--accent)] font-mono text-xs opacity-40 group-hover:opacity-100 transition-opacity duration-500">
+        0{idx + 1}
+      </div>
+      <div className="md:col-span-7 space-y-6">
+        <h3 className="text-3xl sm:text-4xl font-bold text-[var(--text)] transition-colors duration-500 group-hover:text-[var(--accent)]">
+          {p.title}
+        </h3>
+        <p className="text-[var(--text-body)] text-lg leading-relaxed max-w-xl">
+          {p.desc}
+        </p>
+        <div className="flex flex-wrap gap-3">
+          {p.tech.map((t) => (
+            <span key={t} className="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] px-3 py-1 border border-[var(--border)] group-hover:border-[var(--border-hover)] transition-colors duration-500">
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="md:col-span-4 md:text-right flex flex-col md:items-end gap-4">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-4">
+          {p.year}
+        </span>
+        <a
+          href={p.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-secondary inline-flex items-center gap-3 w-fit group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] transition-all duration-500"
+        >
+          Explore <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-500" />
+        </a>
+      </div>
+    </div>
+  )
+}
 
 export default function Projects() {
   const [active, setActive] = useState('featured')
   const activeTab = tabs.find((t) => t.id === active) ?? tabs[0]
 
   return (
-    <section id="projects" className="py-20 sm:py-32 max-w-5xl mx-auto px-6 sm:px-8">
-      {/* Header */}
-      <motion.div
-        className="flex items-end justify-between gap-6 mb-12 flex-wrap"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.5 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-3">Portfolio</p>
-          <h2 className="text-4xl sm:text-5xl font-black heading-accent">Builds</h2>
+    <section id="projects" className="py-24 sm:py-48 max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 mb-24">
+        <div className="max-w-2xl">
+          <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-[var(--accent)] mb-6">Works</p>
+          <WindText className="text-5xl sm:text-7xl heading-accent mb-8">
+            Arrangements
+          </WindText>
+          <p className="text-[var(--text-body)] text-lg font-light leading-relaxed">
+            Each project is a small garden — shaped by constraints,
+            defined by what was left out as much as what was put in.
+          </p>
         </div>
-        <div className="flex gap-2">
-          {tabs.map((tab) => {
-            const Icon = tab.icon
-            const isActive = tab.id === active
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActive(tab.id)}
-                className="px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm font-semibold transition-colors duration-300 border"
-                style={{
-                  backgroundColor: isActive ? 'var(--accent-soft)' : 'transparent',
-                  borderColor: isActive ? 'var(--accent)' : 'var(--border)',
-                  color: isActive ? 'var(--accent)' : 'var(--text-muted)',
-                }}
-              >
-                <Icon size={14} />
-                {tab.label}
-              </button>
-            )
-          })}
+        <div className="flex gap-8 border-b border-[var(--border)]">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActive(tab.id)}
+              className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all duration-500 relative ${
+                active === tab.id ? 'text-[var(--text)]' : 'text-[var(--text-muted)] hover:text-[var(--text-body)]'
+              }`}
+            >
+              {tab.label}
+              {active === tab.id && (
+                <motion.div
+                  layoutId="activeProjTab"
+                  className="absolute bottom-0 left-0 right-0 h-[1px] bg-[var(--accent)]"
+                />
+              )}
+            </button>
+          ))}
         </div>
-      </motion.div>
+      </div>
 
-      {/* Cards */}
       <AnimatePresence mode="wait">
         <motion.div
           key={active}
-          className="grid gap-6 lg:grid-cols-2"
-          initial={{ opacity: 0, y: 20 }}
+          className="grid gap-12"
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -15 }}
-          transition={{ duration: 0.35 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.5 }}
         >
           {activeTab.items.map((p, idx) => (
-            <motion.article
-              key={p.title}
-              className="glass-card p-7 flex flex-col relative overflow-hidden group"
-              style={{
-                borderColor: `${p.color}30`,
-                backgroundImage: `linear-gradient(145deg, ${p.color}08, transparent 50%)`,
-              }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: idx * 0.08 }}
-              whileHover={{ y: -4, transition: { duration: 0.25 } }}
-            >
-              <div className="flex items-start justify-between mb-5">
-                <div
-                  className="px-3 py-1.5 rounded-lg text-xs font-black"
-                  style={{ backgroundColor: `${p.color}15`, color: p.color }}
-                >
-                  {p.year}
-                </div>
-              </div>
-
-              <h3 className="text-2xl font-black mb-3 text-[var(--text)]">{p.title}</h3>
-              <p className="text-[var(--text-muted)] mb-6 leading-relaxed">{p.desc}</p>
-
-              <div className="flex flex-wrap gap-2 mb-6">
-                {p.tech.map((t) => (
-                  <span
-                    key={t}
-                    className="text-xs font-semibold px-3 py-1 rounded-full"
-                    style={{
-                      backgroundColor: `${p.color}0c`,
-                      color: p.color,
-                      border: `1px solid ${p.color}25`,
-                    }}
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-
-              {p.link && p.link !== '#' ? (
-                <a
-                  href={p.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 font-bold text-sm mt-auto transition-all duration-300 hover:gap-3"
-                  style={{ color: p.color }}
-                >
-                  {p.link.includes('github.com') ? <Github size={16} /> : <Globe size={16} />}
-                  {p.link.includes('github.com') ? 'View on GitHub' : 'View page'}
-                </a>
-              ) : (
-                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mt-auto">
-                  Offline / No repo
-                </span>
-              )}
-            </motion.article>
+            <ProjectRow key={p.title} p={p} idx={idx} />
           ))}
         </motion.div>
       </AnimatePresence>

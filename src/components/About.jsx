@@ -1,12 +1,6 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Code, Palette, Zap } from 'lucide-react'
-
-const skills = [
-  { icon: Code, label: 'Development', desc: 'React, Next.js, TypeScript, Tailwind CSS', color: '#8B5CF6' },
-  { icon: Palette, label: 'Design', desc: 'UI/UX, Translucent effects, Theme systems, Animations', color: '#E8915A' },
-  { icon: Zap, label: 'Performance', desc: 'Optimization, Firebase, Supabase, Vercel', color: '#7BA886' },
-]
+import WindText from './WindText'
 
 export default function About() {
   const ref = useRef(null)
@@ -21,47 +15,50 @@ export default function About() {
     <section
       ref={ref}
       id="about"
-      className="py-20 sm:py-32 max-w-5xl mx-auto px-6 sm:px-8"
+      className="py-24 sm:py-48 max-w-5xl mx-auto px-6 sm:px-8"
     >
-      <motion.div className="glass-card p-8 sm:p-12" style={{ y, opacity }}>
-        <h2 className="text-3xl sm:text-5xl font-black mb-8 heading-accent">
-          About Me
-        </h2>
-        <div className="space-y-5 mb-12">
-          <p className="text-[var(--text-body)] leading-relaxed text-lg">
-            I'm a passionate frontend developer with expertise in building responsive, accessible, and performant web applications. With a focus on modern technologies and best practices, I create digital experiences that users love.
-          </p>
-          <p className="text-[var(--text-body)] leading-relaxed text-lg">
-            My toolkit includes React, Next.js, TypeScript, and Tailwind CSS. I specialize in dynamic theming systems, translucent effects, and smooth animations that bring interfaces to life.
-          </p>
+      <motion.div style={{ y, opacity }}>
+        <div className="max-w-3xl">
+          <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-[var(--accent)] mb-6">Philosophy</p>
+          <WindText className="text-5xl sm:text-7xl heading-accent mb-14">
+            The Garden
+          </WindText>
+
+          <div className="space-y-14">
+            <p className="text-[var(--text-body)] text-xl sm:text-2xl font-light leading-relaxed italic border-l border-[var(--accent)] pl-10">
+              A zen garden doesn't demand your attention — it
+              earns it through restraint. I build interfaces the same way.
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-16 text-[var(--text-body)] text-lg leading-relaxed">
+              <p>
+                There is a Japanese concept — <em>ma</em>, the purposeful void.
+                The silence between notes that gives music its shape.
+                I pursue that same emptiness in code: removing
+                until only the essential remains.
+              </p>
+              <p>
+                Performance is not a metric to me, it is a feeling.
+                When an interface responds before you finish thinking,
+                when a transition feels like breathing — that is
+                the craft I care about.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {skills.map((skill, idx) => {
-            const Icon = skill.icon
-            return (
-              <motion.div
-                key={idx}
-                className="p-5 rounded-xl border transition-[border-color] duration-500 hover:scale-[1.03] cursor-default"
-                style={{
-                  backgroundColor: `${skill.color}0a`,
-                  borderColor: `${skill.color}25`,
-                }}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 + idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ borderColor: `${skill.color}55` }}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 rounded-lg" style={{ backgroundColor: `${skill.color}15` }}>
-                    <Icon size={20} style={{ color: skill.color }} />
-                  </div>
-                  <h3 className="font-bold text-[var(--text)]">{skill.label}</h3>
-                </div>
-                <p className="text-sm text-[var(--text-muted)]">{skill.desc}</p>
-              </motion.div>
-            )
-          })}
+        <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-[var(--border)] pt-12">
+          {[
+            { label: 'Runtime', val: 'Bun / Node' },
+            { label: 'Interface', val: 'React' },
+            { label: 'Language', val: 'TypeScript' },
+            { label: 'Atmosphere', val: 'Three.js / GLSL' },
+          ].map((s) => (
+            <div key={s.label} className="group">
+              <div className="text-[10px] font-light uppercase tracking-widest text-[var(--text-muted)] mb-2 group-hover:text-[var(--accent)] transition-colors duration-500">{s.label}</div>
+              <div className="text-sm font-bold uppercase tracking-tight text-[var(--text)] group-hover:translate-x-1 transition-transform duration-500">{s.val}</div>
+            </div>
+          ))}
         </div>
       </motion.div>
     </section>
