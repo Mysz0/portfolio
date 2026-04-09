@@ -122,14 +122,20 @@ function SmoothScroll() {
 export default function App() {
   return (
     <MouseProvider>
-      <div className="relative min-h-screen bg-[var(--bg)] text-[var(--text)] overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
-        <SmoothScroll />
-        <InkTrailCanvas />
+      {/* Fixed layers OUTSIDE overflow wrapper so iOS Safari doesn't clip them */}
+      <Suspense fallback={null}>
+        <ShaderBackground />
+      </Suspense>
+      <InkTrailCanvas />
 
-        {/* Atmospheric Background */}
-        <Suspense fallback={null}>
-          <ShaderBackground />
-        </Suspense>
+      <div
+        className="relative min-h-screen text-[var(--text)] overflow-x-hidden selection:bg-[var(--accent)] selection:text-white"
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
+      >
+        <SmoothScroll />
 
         {/* Content - Cinematic Scroll Journey */}
         <main className="relative z-10 space-y-0 pb-32">

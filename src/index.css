@@ -334,6 +334,10 @@
 
 /* ============ BASE ============ */
 
+html {
+  background: var(--bg);
+}
+
 body {
   font-family: var(--font-sans, "Sora", system-ui, sans-serif);
   background: var(--bg);
