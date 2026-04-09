@@ -113,6 +113,13 @@ const tabs = [
         link: 'https://me.hyruki.cc',
         year: '2026',
       },
+      {
+        title: 'Peek',
+        desc: 'A native macOS app that transforms the MacBook notch into a Dynamic Island with media controls, calendar, and file shelf.',
+        tech: ['Swift', 'SwiftUI', 'AppKit'],
+        link: 'https://peek.hyruki.cc',
+        year: '2026',
+      },
     ],
   },
   {
