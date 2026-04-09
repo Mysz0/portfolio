@@ -74,7 +74,7 @@ function DemonText({ text }) {
   return (
     <span ref={containerRef} className={`demon-text${alreadyRevealed ? ' demon-reveal' : ''}`}>
       {charData.map((word, wIdx) => (
-        <span key={wIdx} style={{ display: 'inline-block', whiteSpace: 'pre' }}>
+        <span key={wIdx} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
           {word.map((d, cIdx) => (
             <span
               key={cIdx}
@@ -85,9 +85,7 @@ function DemonText({ text }) {
               {d.ch}
             </span>
           ))}
-          {wIdx < charData.length - 1 && (
-            <span style={{ display: 'inline', whiteSpace: 'pre' }}>{' '}</span>
-          )}
+          {wIdx < charData.length - 1 && ' '}
         </span>
       ))}
     </span>

@@ -143,12 +143,8 @@ function Scene() {
     uAccent: { value: new THREE.Color('#B7372E') },
   }), [])
 
-  const frameSkip = useRef(0)
-
   useFrame((state) => {
     if (!meshRef.current) return
-    // Throttle to ~30fps — shader doesn't need 60fps updates
-    if (++frameSkip.current % 2 !== 0) return
     const u = meshRef.current.material.uniforms
     u.uTime.value = state.clock.elapsedTime
     u.uScroll.value = scrollRef.current
