@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo, Fragment } from 'react'
 import { motion, AnimatePresence, useSpring, useMotionValue } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import WindText from './WindText'
@@ -74,19 +74,21 @@ function DemonText({ text }) {
   return (
     <span ref={containerRef} className={`demon-text${alreadyRevealed ? ' demon-reveal' : ''}`}>
       {charData.map((word, wIdx) => (
-        <span key={wIdx} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
-          {word.map((d, cIdx) => (
-            <span
-              key={cIdx}
-              className="demon-char"
-              data-occult={d.occult}
-              style={alreadyRevealed ? undefined : { '--demon-d': `${d.delay}ms` }}
-            >
-              {d.ch}
-            </span>
-          ))}
+        <Fragment key={wIdx}>
+          <span style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
+            {word.map((d, cIdx) => (
+              <span
+                key={cIdx}
+                className="demon-char"
+                data-occult={d.occult}
+                style={alreadyRevealed ? undefined : { '--demon-d': `${d.delay}ms` }}
+              >
+                {d.ch}
+              </span>
+            ))}
+          </span>
           {wIdx < charData.length - 1 && ' '}
-        </span>
+        </Fragment>
       ))}
     </span>
   )
