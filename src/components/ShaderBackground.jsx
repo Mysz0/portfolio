@@ -1,8 +1,6 @@
-import { useRef, useMemo, useEffect, Suspense, lazy } from 'react'
+import { useRef, useMemo, useEffect, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-
-const PixelParticles = lazy(() => import('./PixelParticles'))
 
 const vertexShader = `
   varying vec2 vUv;
@@ -145,8 +143,12 @@ function Scene() {
     uAccent: { value: new THREE.Color('#B7372E') },
   }), [])
 
+  const frameSkip = useRef(0)
+
   useFrame((state) => {
     if (!meshRef.current) return
+    // Throttle to ~30fps — shader doesn't need 60fps updates
+    if (++frameSkip.current % 2 !== 0) return
     const u = meshRef.current.material.uniforms
     u.uTime.value = state.clock.elapsedTime
     u.uScroll.value = scrollRef.current
@@ -155,17 +157,14 @@ function Scene() {
   })
 
   return (
-    <>
-      <mesh ref={meshRef}>
-        <planeGeometry args={[20, 20]} />
-        <shaderMaterial
-          vertexShader={vertexShader}
-          fragmentShader={fragmentShader}
-          uniforms={uniforms}
-        />
-      </mesh>
-      <PixelParticles count={600} scrollRef={scrollRef} />
-    </>
+    <mesh ref={meshRef}>
+      <planeGeometry args={[20, 20]} />
+      <shaderMaterial
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
+        uniforms={uniforms}
+      />
+    </mesh>
   )
 }
 

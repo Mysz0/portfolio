@@ -16,6 +16,38 @@
   --animate-fade-up: fade-up 0.8s ease-out forwards;
   --animate-shimmer: shimmer 2.5s linear infinite;
   --animate-drift: drift 20s ease-in-out infinite;
+  --animate-breathe: breathe 8s ease-in-out infinite;
+  --animate-breathe-slow: breathe-slow 12s ease-in-out infinite;
+  --animate-sway: sway 7s ease-in-out infinite;
+  --animate-drift-gentle: drift-gentle 14s ease-in-out infinite;
+}
+
+/* ============ GLOBAL BREATHING RHYTHM ============ */
+/* A unified oscillation system — different elements subscribe
+   at different phases, creating an ensemble that feels alive */
+
+@property --breath-phase {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --breath-glow {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --breath-y {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --underline-width {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
 }
 
 /* ============ KEYFRAMES ============ */
@@ -45,6 +77,240 @@
   25% { transform: translate(40px, -25px) scale(1.05); }
   50% { transform: translate(-15px, 35px) scale(0.98); }
   75% { transform: translate(25px, 15px) scale(1.03); }
+}
+
+/* Breathing — the primary rhythm. 8s cycle, gentle vertical bob + opacity */
+@keyframes breathe {
+  0%, 100% {
+    --breath-phase: 0;
+    transform: translateY(0px);
+    opacity: var(--breathe-base-opacity, 1);
+  }
+  50% {
+    --breath-phase: 1;
+    transform: translateY(var(--breathe-distance, -3px));
+    opacity: var(--breathe-peak-opacity, 1);
+  }
+}
+
+/* Slow breathing — for ambient elements. 12s cycle */
+@keyframes breathe-slow {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    opacity: var(--breathe-base-opacity, 0.4);
+  }
+  50% {
+    transform: translateY(var(--breathe-distance, -2px)) scale(var(--breathe-scale, 1.02));
+    opacity: var(--breathe-peak-opacity, 0.7);
+  }
+}
+
+/* Gentle lateral sway — like bamboo in wind */
+@keyframes sway {
+  0%, 100% { transform: translateX(0px) rotate(0deg); }
+  33% { transform: translateX(var(--sway-distance, 2px)) rotate(var(--sway-rotate, 0.3deg)); }
+  66% { transform: translateX(calc(var(--sway-distance, 2px) * -0.6)) rotate(calc(var(--sway-rotate, 0.3deg) * -0.5)); }
+}
+
+/* Multi-axis ambient drift — for decorative elements */
+@keyframes drift-gentle {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(var(--drift-x, 4px), var(--drift-y, -3px)); }
+  50% { transform: translate(calc(var(--drift-x, 4px) * -0.5), var(--drift-y, -3px)); }
+  75% { transform: translate(calc(var(--drift-x, 4px) * -0.8), calc(var(--drift-y, -3px) * -0.3)); }
+}
+
+/* Underline expansion for form focus */
+@keyframes underline-expand {
+  from { --underline-width: 0%; }
+  to { --underline-width: 100%; }
+}
+
+/* Border glow pulse for interactive elements */
+@keyframes border-breathe {
+  0%, 100% { border-color: var(--border); }
+  50% { border-color: var(--border-hover); }
+}
+
+/* ============ INK FADE CYCLE — autonomous hero typography ============ */
+
+/* Per-character ink drying/wetting — independent opacity + subtle wobble */
+@keyframes ink-fade {
+  0%, 100% {
+    opacity: var(--ink-base, 0.72);
+    filter: blur(0.4px) brightness(var(--ink-cool, 0.88));
+    transform: rotate(0deg) translateY(0px);
+  }
+  30% {
+    opacity: var(--ink-peak, 0.95);
+    filter: blur(0px) brightness(var(--ink-warm, 0.96));
+    transform: rotate(var(--ink-wobble, 0.3deg)) translateY(var(--ink-drift, -1.5px));
+  }
+  60% {
+    opacity: calc(var(--ink-base, 0.72) + 0.08);
+    filter: blur(0.2px) brightness(calc(var(--ink-cool, 0.88) + 0.03));
+    transform: rotate(calc(var(--ink-wobble, 0.3deg) * -0.6)) translateY(calc(var(--ink-drift, -1.5px) * 0.4));
+  }
+  85% {
+    opacity: var(--ink-peak, 0.95);
+    filter: blur(0px) brightness(var(--ink-warm, 0.96));
+    transform: rotate(calc(var(--ink-wobble, 0.3deg) * 0.3)) translateY(calc(var(--ink-drift, -1.5px) * -0.3));
+  }
+}
+
+/* Word-by-word subtitle breathing */
+@keyframes word-breathe {
+  0%, 100% {
+    opacity: var(--word-base, 0.55);
+    transform: translateY(0px);
+  }
+  50% {
+    opacity: var(--word-peak, 0.85);
+    transform: translateY(var(--word-drift, -1px));
+  }
+}
+
+/* Kanji slow drift with fade */
+@keyframes kanji-drift {
+  0%, 100% {
+    opacity: 0.35;
+    transform: translateX(0px) translateY(0px);
+    letter-spacing: 0.5em;
+  }
+  35% {
+    opacity: 0.55;
+    transform: translateX(3px) translateY(-1px);
+    letter-spacing: 0.52em;
+  }
+  70% {
+    opacity: 0.4;
+    transform: translateX(-2px) translateY(0.5px);
+    letter-spacing: 0.48em;
+  }
+}
+
+/* Scroll indicator gentle pulse */
+@keyframes scroll-hint {
+  0%, 100% {
+    opacity: 0.25;
+    transform: translateY(0px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(4px);
+  }
+}
+
+/* Skill card ambient float — asymmetric multi-axis drift */
+@keyframes skill-float {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  30% {
+    transform: translateY(var(--float-y, -2px)) translateX(var(--float-x, 1px));
+  }
+  70% {
+    transform: translateY(calc(var(--float-y, -2px) * 0.4)) translateX(calc(var(--float-x, 1px) * -0.7));
+  }
+}
+
+/* Ink character autonomous animation class */
+.ink-char {
+  display: inline-block;
+  animation: ink-fade var(--ink-duration, 9s) ease-in-out infinite;
+  animation-delay: var(--ink-delay, 0s);
+  vertical-align: baseline;
+}
+
+/* Subtitle word autonomous animation */
+.word-breathe {
+  display: inline-block;
+  animation: word-breathe var(--word-duration, 7s) ease-in-out infinite;
+  animation-delay: var(--word-delay, 0s);
+}
+
+/* Skill card float — CSS outer wrapper for autonomous drift */
+.skill-float {
+  animation: skill-float var(--float-duration, 10s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+/* Hiragana ink-in-water dissolve */
+@keyframes ink-dissolve {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+    filter: blur(0px);
+  }
+  10% {
+    opacity: 0.5;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  35% {
+    opacity: 0.25;
+    transform: scale(1.4) translateY(-8px);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.8) translateY(-20px);
+    filter: blur(8px);
+  }
+}
+
+.hiragana-ripple {
+  position: absolute;
+  font-family: var(--font-accent);
+  font-size: clamp(2.5rem, 4vw, 4rem);
+  color: var(--accent);
+  pointer-events: none;
+  animation: ink-dissolve 3s ease-out forwards;
+  will-change: transform, opacity, filter;
+  line-height: 1;
+}
+
+/* DemonText — occult-to-real crossfade via CSS transitions */
+.demon-char {
+  position: relative;
+  display: inline-block;
+  vertical-align: baseline;
+  color: transparent;
+  transition: color 0.3s ease-out var(--demon-d, 0ms);
+}
+
+.demon-char::before {
+  content: attr(data-occult);
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent);
+  opacity: 0.45;
+  filter: blur(1px);
+  pointer-events: none;
+  transition-property: opacity, filter;
+  transition-duration: 0.3s;
+  transition-timing-function: ease-out;
+  transition-delay: var(--demon-d, 0ms);
+}
+
+.demon-reveal .demon-char {
+  color: var(--text-body);
+}
+
+.demon-reveal .demon-char::before {
+  opacity: 0;
+  filter: blur(4px);
+}
+
+/* Kanji autonomous drift */
+.kanji-drift {
+  animation: kanji-drift 16s ease-in-out infinite;
+}
+
+/* Scroll hint */
+.scroll-hint {
+  animation: scroll-hint 3s ease-in-out infinite;
 }
 
 /* ============ THEME VARIABLES ============ */
@@ -83,7 +349,7 @@ body {
   color: var(--text);
   font-family: var(--font-accent, "Cormorant Garamond", serif);
   font-weight: 400;
-  font-style: italic; /* Added elegance */
+  font-style: italic;
 }
 
 /* Clear, sharp containers */
@@ -94,6 +360,90 @@ body {
   transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ============ BREATHING ELEMENTS ============ */
+
+/* Anything with .breathe gets the primary rhythm */
+.breathe {
+  animation: breathe 8s ease-in-out infinite;
+  --breathe-distance: -3px;
+  --breathe-base-opacity: 1;
+  --breathe-peak-opacity: 1;
+}
+
+/* Stagger phases for ensemble feel */
+.breathe-delay-1 { animation-delay: -2s; }
+.breathe-delay-2 { animation-delay: -4s; }
+.breathe-delay-3 { animation-delay: -6s; }
+
+/* Ambient breathing — for decorative/secondary elements */
+.breathe-ambient {
+  animation: breathe-slow 12s ease-in-out infinite;
+  --breathe-distance: -2px;
+  --breathe-scale: 1.02;
+  --breathe-base-opacity: 0.4;
+  --breathe-peak-opacity: 0.65;
+}
+
+/* Gentle sway — lateral movement like wind */
+.sway {
+  animation: sway 7s ease-in-out infinite;
+  --sway-distance: 2px;
+  --sway-rotate: 0.3deg;
+}
+
+.sway-delay-1 { animation-delay: -1.5s; }
+.sway-delay-2 { animation-delay: -3s; }
+.sway-delay-3 { animation-delay: -5s; }
+
+/* Multi-axis drift for ambient elements */
+.drift-gentle {
+  animation: drift-gentle 14s ease-in-out infinite;
+  --drift-x: 4px;
+  --drift-y: -3px;
+}
+
+/* Border breathing — containers that subtly pulse their borders */
+.border-breathe {
+  animation: border-breathe 6s ease-in-out infinite;
+}
+
+/* ============ INTERACTIVE WARMTH ============ */
+
+.warmth-target {
+  transition: filter 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.warmth-target.warm {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* ============ FORM FOCUS ANIMATIONS ============ */
+
+.input-zen {
+  position: relative;
+  background: transparent;
+}
+
+.input-zen-line {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              left 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.input-zen:focus-within .input-zen-line {
+  width: 100%;
+  left: 0;
+}
+
+/* ============ BUTTONS ============ */
+
 .btn-primary {
   background: var(--text);
   color: var(--bg);
@@ -102,14 +452,35 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-size: 0.7rem;
-  transition: all 0.4s ease;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 0;
+}
+
+.btn-primary:hover::after {
+  transform: scaleX(1);
 }
 
 .btn-primary:hover {
-  background: var(--accent);
   color: #fff;
   transform: translateY(-2px);
+}
+
+.btn-primary span {
+  position: relative;
+  z-index: 1;
 }
 
 .btn-secondary {
@@ -119,10 +490,45 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-size: 0.7rem;
-  transition: all 0.4s ease;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .btn-secondary:hover {
   background: var(--text);
   color: var(--bg);
+  border-color: var(--text);
+}
+
+/* ============ REDUCED MOTION ============ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.2s !important;
+  }
+
+  .breathe,
+  .breathe-ambient,
+  .sway,
+  .drift-gentle,
+  .border-breathe,
+  .ink-char,
+  .word-breathe,
+  .kanji-drift,
+  .scroll-hint,
+  .skill-float,
+  .hiragana-ripple {
+    animation: none !important;
+  }
+
+  .demon-char,
+  .demon-char::before {
+    transition: none !important;
+  }
+
+  .warmth-target.warm {
+    filter: none;
+    transform: none;
+  }
 }
