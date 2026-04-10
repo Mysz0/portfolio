@@ -2,6 +2,15 @@ import { useRef, useMemo, useEffect, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
+/* ── iOS detection ─────────────────────────────────────── */
+const getIsIOS = () => {
+  if (typeof navigator === 'undefined') return false
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  )
+}
+
 const vertexShader = `
   varying vec2 vUv;
   void main() {
@@ -14,6 +23,9 @@ const fragmentShader = `
   uniform float uTime;
   uniform float uScroll;
   uniform vec3 uAccent;
+  uniform float uIsIOS;
+  uniform float uViewportH;
+  uniform float uDpr;
   varying vec2 vUv;
 
   vec4 permute(vec4 x){ return mod(((x*34.0)+1.0)*x, 289.0); }
@@ -91,8 +103,8 @@ const fragmentShader = `
     float accentStr = zProjects * 0.35 + zContact * 0.2;
 
     // ── Base: cool dark ↔ warm dark, with visible noise variation ──
-    vec3 coolDark  = vec3(0.04, 0.042, 0.058);
-    vec3 warmDark  = vec3(0.075, 0.06,  0.045);
+    vec3 coolDark  = vec3(0.078, 0.078, 0.075);
+    vec3 warmDark  = vec3(0.085, 0.075, 0.065);
     vec3 coolLight = vec3(0.13,  0.14,  0.18);
     vec3 warmLight = vec3(0.22,  0.17,  0.13);
 
@@ -118,6 +130,24 @@ const fragmentShader = `
     vig = smoothstep(-0.1, 0.65, vig);
     base *= mix(0.6, 1.0, vig);
 
+    // ── iOS Safari chrome blending ──
+    // Safari draws opaque chrome (status bar, toolbar) filled with
+    // theme-color at screen edges. Gradually darken shader toward
+    // that same color so the boundary is nearly invisible.
+    // No zone math — just fade from canvas edges inward.
+    if (uIsIOS > 0.5) {
+      vec3 chromeColor = vec3(0.07843, 0.07843, 0.07451); // exact #141413
+      float cssY = gl_FragCoord.y / uDpr;
+      float fromBottom = cssY;
+      float fromTop = uViewportH - cssY;
+
+      // Large smooth fades — 120px bottom (toolbar), 80px top (status bar)
+      float bottomFade = smoothstep(0.0, 120.0, fromBottom);
+      float topFade = smoothstep(0.0, 80.0, fromTop);
+
+      base = mix(chromeColor, base, bottomFade * topFade);
+    }
+
     gl_FragColor = vec4(base, 1.0);
   }
 `
@@ -125,6 +155,8 @@ const fragmentShader = `
 function Scene() {
   const meshRef = useRef()
   const scrollRef = useRef(0)
+  const isIOS = useMemo(() => getIsIOS(), [])
+  const dprSynced = useRef(false)
 
   useEffect(() => {
     const onScroll = () => {
@@ -139,13 +171,43 @@ function Scene() {
     uTime: { value: 0 },
     uScroll: { value: 0 },
     uAccent: { value: new THREE.Color('#B7372E') },
-  }), [])
+    uIsIOS: { value: isIOS ? 1.0 : 0.0 },
+    uViewportH: { value: window.innerHeight },
+    uDpr: { value: Math.min(Math.max(window.devicePixelRatio, 1), 1.5) },
+  }), [isIOS])
+
+  /* Keep viewport height current on resize / toolbar change */
+  useEffect(() => {
+    if (!isIOS) return
+    const update = () => {
+      if (!meshRef.current) return
+      meshRef.current.material.uniforms.uViewportH.value = window.innerHeight
+    }
+    window.addEventListener('resize', update, { passive: true })
+    window.addEventListener('orientationchange', update, { passive: true })
+    /* Visual Viewport API — tracks dynamic toolbar (iOS 26+) */
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', update, { passive: true })
+    }
+    return () => {
+      window.removeEventListener('resize', update)
+      window.removeEventListener('orientationchange', update)
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', update)
+      }
+    }
+  }, [isIOS])
 
   useFrame((state) => {
     if (!meshRef.current) return
     const u = meshRef.current.material.uniforms
     u.uTime.value = state.clock.elapsedTime
     u.uScroll.value = scrollRef.current
+    /* Sync actual DPR from renderer once (R3F may pick a different value) */
+    if (!dprSynced.current) {
+      u.uDpr.value = state.gl.getPixelRatio()
+      dprSynced.current = true
+    }
     state.camera.position.z = 5.0
     state.camera.lookAt(0, 0, 0)
   })
@@ -164,15 +226,7 @@ function Scene() {
 
 export default function ShaderBackground() {
   return (
-    <div
-      className="fixed z-0 pointer-events-none"
-      style={{
-        top: 'env(safe-area-inset-top, 0px)',
-        right: 'env(safe-area-inset-right, 0px)',
-        bottom: 'env(safe-area-inset-bottom, 0px)',
-        left: 'env(safe-area-inset-left, 0px)',
-      }}
-    >
+    <div className="fixed inset-0 z-0 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         gl={{ alpha: false, antialias: false, powerPreference: 'high-performance' }}
