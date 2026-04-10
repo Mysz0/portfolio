@@ -67,14 +67,13 @@ const fragmentShader = `
     float t = uTime * 0.018;
     float s = uScroll;
 
-    // ── 3 octaves — visible ink-cloud texture ──
-    float n1 = snoise(vec3(uv * 1.8, t));
-    float n2 = snoise(vec3(uv * 3.5 + 7.0, t * 0.8));
-    float n3 = snoise(vec3(uv * 7.0 + 15.0, t * 0.5));
+    // ── 3 octaves — larger scale for visible ink-cloud texture ──
+    float n1 = snoise(vec3(uv * 1.2, t));
+    float n2 = snoise(vec3(uv * 2.4 + 7.0, t * 0.8));
+    float n3 = snoise(vec3(uv * 5.0 + 15.0, t * 0.5));
     float noise = (n1 * 0.55 + n2 * 0.3 + n3 * 0.15) * 0.5 + 0.5;
 
     // ── Section zones (gaussian blobs along scroll) ──
-    //    Hero ~0.0  |  About ~0.2  |  Projects ~0.4  |  Setup ~0.6  |  Keyboards ~0.72  |  Contact ~0.88
     float zAbout    = exp(-pow((s - 0.20) * 5.0, 2.0));
     float zProjects = exp(-pow((s - 0.40) * 5.0, 2.0));
     float zSetup    = exp(-pow((s - 0.60) * 5.0, 2.0));
@@ -91,29 +90,28 @@ const fragmentShader = `
     // Accent intensity (red glow strongest in Projects + Contact zones)
     float accentStr = zProjects * 0.35 + zContact * 0.2;
 
-    // ── Base: cool dark ↔ warm dark, with VISIBLE noise variation ──
-    vec3 coolDark  = vec3(0.035, 0.038, 0.05);   // blue-ish dark slate
-    vec3 warmDark  = vec3(0.07,  0.055, 0.04);    // earthy dark
-    vec3 coolLight = vec3(0.08,  0.085, 0.11);    // lighter cool (noise peaks)
-    vec3 warmLight = vec3(0.14,  0.11,  0.08);    // lighter warm (noise peaks)
+    // ── Base: cool dark ↔ warm dark, with visible noise variation ──
+    vec3 coolDark  = vec3(0.04, 0.042, 0.058);
+    vec3 warmDark  = vec3(0.075, 0.06,  0.045);
+    vec3 coolLight = vec3(0.13,  0.14,  0.18);
+    vec3 warmLight = vec3(0.22,  0.17,  0.13);
 
     vec3 dark  = mix(coolDark,  warmDark,  warmth);
     vec3 light = mix(coolLight, warmLight, warmth);
 
-    // Noise blends between dark and light — this creates VISIBLE texture
+    // Noise blends between dark and light
     vec3 base = mix(dark, light, noise);
 
     // ── Accent glow — red ink bleeding through the surface ──
-    // Modulated by noise so it feels organic, not a flat overlay
     base += uAccent * accentStr * noise * noise;
 
-    // ── Scroll-following warm band — a soft lantern glow that tracks position ──
+    // ── Scroll-following warm band ──
     float band = exp(-pow((uv.y - s) * 2.5, 2.0));
-    base += mix(vec3(0.02, 0.015, 0.01), vec3(0.04, 0.02, 0.01), warmth) * band;
+    base += mix(vec3(0.035, 0.025, 0.018), vec3(0.06, 0.035, 0.018), warmth) * band;
 
-    // ── Slow horizontal drift tied to scroll (sand-shifting feel) ──
-    float drift = snoise(vec3(uv.x * 3.0 + s * 2.0, uv.y * 1.5, t * 0.5)) * 0.5 + 0.5;
-    base += vec3(0.012, 0.010, 0.008) * drift * (0.3 + warmth * 0.7);
+    // ── Slow horizontal drift tied to scroll ──
+    float drift = snoise(vec3(uv.x * 2.0 + s * 2.0, uv.y * 1.0, t * 0.5)) * 0.5 + 0.5;
+    base += vec3(0.02, 0.016, 0.012) * drift * (0.3 + warmth * 0.7);
 
     // ── Gentle vignette ──
     float vig = 1.0 - length((uv - 0.5) * 1.3);

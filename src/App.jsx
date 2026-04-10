@@ -122,7 +122,6 @@ function SmoothScroll() {
 export default function App() {
   return (
     <MouseProvider>
-      {/* Fixed layers OUTSIDE overflow wrapper so iOS Safari doesn't clip them */}
       <Suspense fallback={null}>
         <ShaderBackground />
       </Suspense>
