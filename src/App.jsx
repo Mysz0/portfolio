@@ -107,12 +107,16 @@ function SmoothScroll() {
       smoothWheel: true,
       touchMultiplier: 1.5,
     })
+    let rafId = null
     function raf(time) {
       lenis.raf(time)
-      requestAnimationFrame(raf)
+      rafId = requestAnimationFrame(raf)
     }
-    requestAnimationFrame(raf)
-    return () => lenis.destroy()
+    rafId = requestAnimationFrame(raf)
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId)
+      lenis.destroy()
+    }
   }, [])
   return null
 }

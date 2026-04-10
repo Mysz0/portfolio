@@ -39,10 +39,11 @@ const keyboards = [
 ]
 
 /* Spring-physics tilt card — organic motion with mass and damping */
-function TiltCard({ children, className, delay = 0 }) {
+function TiltCard({ children, className, delay = 0, sectionVisible }) {
   const ref = useRef(null)
   const isHovered = useRef(false)
   const rafId = useRef(null)
+  const pollId = useRef(null)
 
   // Spring-driven rotation for organic feel
   const rotateX = useMotionValue(0)
@@ -51,13 +52,20 @@ function TiltCard({ children, className, delay = 0 }) {
   const springRotateY = useSpring(rotateY, { stiffness: 150, damping: 20, mass: 0.5 })
   const springY = useSpring(0, { stiffness: 200, damping: 25 })
 
-  // Leaf-on-water idle float — gentle bob + rotation when not hovered
+  // Leaf-on-water idle float — pauses when section is offscreen
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReduced) return
 
     const phase = delay * 2.1
     function tick(now) {
+      if (sectionVisible && !sectionVisible.current) {
+        rafId.current = null
+        pollId.current = setTimeout(() => {
+          rafId.current = requestAnimationFrame(tick)
+        }, 500)
+        return
+      }
       rafId.current = requestAnimationFrame(tick)
       if (isHovered.current) return
       const t = now / 1000
@@ -66,8 +74,11 @@ function TiltCard({ children, className, delay = 0 }) {
       rotateX.set(Math.cos(t * 0.2 + phase) * 1)
     }
     rafId.current = requestAnimationFrame(tick)
-    return () => { if (rafId.current) cancelAnimationFrame(rafId.current) }
-  }, [delay, rotateX, rotateY, springY])
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current)
+      if (pollId.current) clearTimeout(pollId.current)
+    }
+  }, [delay, rotateX, rotateY, springY, sectionVisible])
 
   const handleMouseMove = useCallback((e) => {
     if (!ref.current) return
@@ -204,6 +215,7 @@ export default function Keyboards() {
             <TiltCard
               className="group p-10 flex flex-col border-b lg:border-b-0 lg:border-r border-[var(--border)] last:border-r-0 hover:bg-[var(--accent-soft)] transition-colors duration-700 h-full cursor-default"
               delay={idx}
+              sectionVisible={isVisible}
             >
               <div className="flex justify-between items-start mb-12">
                 <span

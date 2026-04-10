@@ -11,6 +11,13 @@ const getIsIOS = () => {
   )
 }
 
+/* ── Mobile detection (for DPR cap) ────────────────────── */
+const getIsMobile = () => {
+  if (typeof navigator === 'undefined') return false
+  return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints > 1 && 'ontouchstart' in window)
+}
+
 const vertexShader = `
   varying vec2 vUv;
   void main() {
@@ -225,12 +232,14 @@ function Scene() {
 }
 
 export default function ShaderBackground() {
+  const mobileDpr = useMemo(() => getIsMobile() ? [1, 1] : [1, 1.5], [])
+
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         gl={{ alpha: false, antialias: false, powerPreference: 'high-performance' }}
-        dpr={[1, 1.5]}
+        dpr={mobileDpr}
       >
         <Suspense fallback={null}>
           <Scene />

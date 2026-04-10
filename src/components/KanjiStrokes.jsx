@@ -135,7 +135,28 @@ export default function KanjiStrokes({ rhythmRef, className = '' }) {
       return
     }
 
+    // Visibility observer — pause rAF when offscreen
+    const isVisibleRef = { current: true }
+    let pollId = null
+    const observer = new IntersectionObserver(
+      ([entry]) => { isVisibleRef.current = entry.isIntersecting },
+      { threshold: 0, rootMargin: '200px' },
+    )
+    observer.observe(containerRef.current)
+
+    // Cache querySelectorAll result (stable after mount)
+    const cachedPaths = paths
+
     function tick(now) {
+      if (!isVisibleRef.current) {
+        // Offscreen: stop rAF, poll via setTimeout
+        animRef.current = null
+        pollId = setTimeout(() => {
+          animRef.current = requestAnimationFrame(tick)
+        }, 500)
+        return
+      }
+
       animRef.current = requestAnimationFrame(tick)
 
       if (!containerRef.current || !rhythmRef?.current) return
@@ -143,11 +164,9 @@ export default function KanjiStrokes({ rhythmRef, className = '' }) {
       const elapsed = (now - rhythmRef.current.origin) / 1000
       const ct = ((elapsed % CYCLE_DURATION) + CYCLE_DURATION) % CYCLE_DURATION
 
-      const paths = containerRef.current.querySelectorAll('[data-stroke]')
-
       for (let i = 0; i < STROKE_TIMINGS.length; i++) {
         const st = STROKE_TIMINGS[i]
-        const path = paths[i]
+        const path = cachedPaths[i]
         if (!path) continue
         const len = pathLengths.current[i]
         if (!len) continue
@@ -184,6 +203,8 @@ export default function KanjiStrokes({ rhythmRef, className = '' }) {
     animRef.current = requestAnimationFrame(tick)
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current)
+      if (pollId) clearTimeout(pollId)
+      observer.disconnect()
     }
   }, [rhythmRef])
 

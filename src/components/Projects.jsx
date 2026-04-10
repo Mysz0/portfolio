@@ -144,7 +144,7 @@ const tabs = [
   },
 ]
 
-function ProjectRow({ p, idx }) {
+function ProjectRow({ p, idx, sectionVisible }) {
   const ref = useRef(null)
   const x = useMotionValue(0)
   const y = useMotionValue(0)
@@ -152,14 +152,22 @@ function ProjectRow({ p, idx }) {
   const springY = useSpring(y, { stiffness: 180, damping: 25, mass: 0.4 })
   const isHovered = useRef(false)
   const rafId = useRef(null)
+  const pollId = useRef(null)
 
-  // Idle micro-sway — continuous when not hovered
+  // Idle micro-sway — pauses when section is offscreen
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReduced) return
 
     const phase = idx * 1.8
     function tick(now) {
+      if (!sectionVisible.current) {
+        rafId.current = null
+        pollId.current = setTimeout(() => {
+          rafId.current = requestAnimationFrame(tick)
+        }, 500)
+        return
+      }
       rafId.current = requestAnimationFrame(tick)
       if (isHovered.current) return
       const t = now / 1000
@@ -167,8 +175,11 @@ function ProjectRow({ p, idx }) {
       y.set(Math.cos(t * 0.3 + phase) * 1.5)
     }
     rafId.current = requestAnimationFrame(tick)
-    return () => { if (rafId.current) cancelAnimationFrame(rafId.current) }
-  }, [idx, x, y])
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current)
+      if (pollId.current) clearTimeout(pollId.current)
+    }
+  }, [idx, x, y, sectionVisible])
 
   const handleMouseMove = useCallback((e) => {
     if (!ref.current) return
@@ -246,9 +257,22 @@ function ProjectRow({ p, idx }) {
 export default function Projects() {
   const [active, setActive] = useState('featured')
   const activeTab = tabs.find((t) => t.id === active) ?? tabs[0]
+  const sectionRef = useRef(null)
+  const sectionVisible = useRef(false)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { sectionVisible.current = entry.isIntersecting },
+      { threshold: 0, rootMargin: '200px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   return (
-    <section id="projects" className="py-24 sm:py-48 max-w-5xl mx-auto px-6 sm:px-8">
+    <section ref={sectionRef} id="projects" className="py-24 sm:py-48 max-w-5xl mx-auto px-6 sm:px-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 mb-24">
         <div className="max-w-2xl">
           <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-[var(--accent)] mb-6 breathe-ambient" style={{ animationDelay: '-2s' }}>Works</p>
@@ -294,7 +318,7 @@ export default function Projects() {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
           {activeTab.items.map((p, idx) => (
-            <ProjectRow key={p.title} p={p} idx={idx} />
+            <ProjectRow key={p.title} p={p} idx={idx} sectionVisible={sectionVisible} />
           ))}
         </motion.div>
       </AnimatePresence>

@@ -12,7 +12,7 @@ const stack = [
 ]
 
 /* Spring-physics row — responds to mouse with organic motion */
-function SpringRow({ item, idx }) {
+function SpringRow({ item, idx, sectionVisible }) {
   const ref = useRef(null)
   const x = useMotionValue(0)
   const y = useMotionValue(0)
@@ -20,14 +20,23 @@ function SpringRow({ item, idx }) {
   const springY = useSpring(y, { stiffness: 200, damping: 30, mass: 0.3 })
   const isHovered = useRef(false)
   const rafId = useRef(null)
+  const pollId = useRef(null)
 
-  // Idle vertical bob — distinct from Projects' lateral sway
+  // Idle vertical bob — pauses when section is offscreen
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReduced) return
 
     const phase = idx * 1.2
     function tick(now) {
+      if (!sectionVisible.current) {
+        // Offscreen: stop rAF, poll via setTimeout
+        rafId.current = null
+        pollId.current = setTimeout(() => {
+          rafId.current = requestAnimationFrame(tick)
+        }, 500)
+        return
+      }
       rafId.current = requestAnimationFrame(tick)
       if (isHovered.current) return
       const t = now / 1000
@@ -35,8 +44,11 @@ function SpringRow({ item, idx }) {
       y.set(Math.sin(t * 0.35 + phase) * 2.5)
     }
     rafId.current = requestAnimationFrame(tick)
-    return () => { if (rafId.current) cancelAnimationFrame(rafId.current) }
-  }, [idx, x, y])
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current)
+      if (pollId.current) clearTimeout(pollId.current)
+    }
+  }, [idx, x, y, sectionVisible])
 
   const handleMouseMove = useCallback((e) => {
     if (!ref.current) return
@@ -85,8 +97,22 @@ function SpringRow({ item, idx }) {
 }
 
 export default function Setup() {
+  const sectionRef = useRef(null)
+  const sectionVisible = useRef(false)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { sectionVisible.current = entry.isIntersecting },
+      { threshold: 0, rootMargin: '200px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section id="setup" className="py-24 sm:py-48 max-w-5xl mx-auto px-6 sm:px-8">
+    <section ref={sectionRef} id="setup" className="py-24 sm:py-48 max-w-5xl mx-auto px-6 sm:px-8">
       <div className="max-w-2xl mb-24">
         <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-[var(--accent)] mb-6 breathe-ambient" style={{ animationDelay: '-1s' }}>Craft</p>
         <WindText className="text-5xl sm:text-7xl heading-accent mb-8">
@@ -100,7 +126,7 @@ export default function Setup() {
 
       <div className="grid gap-1 border-t border-[var(--border)]">
         {stack.map((item, idx) => (
-          <SpringRow key={item.name} item={item} idx={idx} />
+          <SpringRow key={item.name} item={item} idx={idx} sectionVisible={sectionVisible} />
         ))}
       </div>
     </section>

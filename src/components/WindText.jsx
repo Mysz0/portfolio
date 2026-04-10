@@ -219,8 +219,30 @@ export default function WindText({
     let lastTime = performance.now()
     const turbNode = document.getElementById(`${svgFilterId.current}-turb`)
     const dispNode = document.getElementById(`${svgFilterId.current}-disp`)
+    const isVisibleRef = { current: true }
+    let pollId = null
+
+    // Visibility observer — pause rAF when offscreen
+    const observer = new IntersectionObserver(
+      ([entry]) => { isVisibleRef.current = entry.isIntersecting },
+      { threshold: 0, rootMargin: '200px' },
+    )
+    if (containerRef.current) observer.observe(containerRef.current)
+
+    // Cache querySelectorAll result (stable after mount)
+    let cachedChars = null
 
     function tick(now) {
+      if (!isVisibleRef.current) {
+        // Offscreen: stop rAF, poll via setTimeout
+        animFrameRef.current = null
+        pollId = setTimeout(() => {
+          lastTime = performance.now() // reset dt to avoid jump
+          animFrameRef.current = requestAnimationFrame(tick)
+        }, 500)
+        return
+      }
+
       animFrameRef.current = requestAnimationFrame(tick)
 
       const dtRaw = (now - lastTime) / 1000
@@ -229,8 +251,11 @@ export default function WindText({
 
       if (!containerRef.current || !charStates.current) return
 
-      const chars = containerRef.current.querySelectorAll('[data-wind]')
-      if (chars.length !== charStates.current.length) return
+      // Cache chars on first successful query
+      if (!cachedChars || cachedChars.length !== charStates.current.length) {
+        cachedChars = containerRef.current.querySelectorAll('[data-wind]')
+      }
+      if (cachedChars.length !== charStates.current.length) return
 
       const containerRect = containerRef.current.getBoundingClientRect()
       const mx = mouseLocal.current.x
@@ -269,12 +294,14 @@ export default function WindText({
       }
 
       // ── Per-character update ──
-      updateCharsRef.current(chars, containerRect, mx, my, mouseInside, 160, time, dt, true)
+      updateCharsRef.current(cachedChars, containerRect, mx, my, mouseInside, 160, time, dt, true)
     }
 
     animFrameRef.current = requestAnimationFrame(tick)
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+      if (pollId) clearTimeout(pollId)
+      observer.disconnect()
     }
   }, [alive, text.length])
 
