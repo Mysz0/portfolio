@@ -128,7 +128,7 @@ export default function App() {
       </Suspense>
       <InkTrailCanvas />
 
-      <div className="relative min-h-screen bg-[var(--bg)] text-[var(--text)] overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
+      <div className="relative min-h-screen text-[var(--text)] overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
         <SmoothScroll />
 
         {/* Content - Cinematic Scroll Journey */}
