@@ -176,26 +176,35 @@ export default function KanjiStrokes({ rhythmRef, className = '' }) {
           const progress = smoothstep((ct - st.drawStart) / (st.drawEnd - st.drawStart))
           path.style.strokeDashoffset = String(len * (1 - progress))
           path.style.opacity = '1'
-          path.style.transform = ''
+          path.style.transform = 'scale(1)'
         } else if (ct >= st.drawEnd && ct < st.evapStart) {
           /* ── Rest phase — fully visible ── */
           path.style.strokeDashoffset = '0'
           path.style.opacity = '1'
-          path.style.transform = ''
+          path.style.transform = 'scale(1)'
         } else if (ct >= st.evapStart && ct < st.evapEnd) {
-          /* ── Evaporation phase ── */
+          /* ── Pop + evaporation ── */
           const progress = (ct - st.evapStart) / (st.evapEnd - st.evapStart)
-          const easeIn = progress * progress
+          if (progress < 0.15) {
+            const popT = progress / 0.15
+            const scale = 1 + popT * 0.35
+            const opacity = 1 - popT * 0.1
+            path.style.transform = `scale(${scale})`
+            path.style.opacity = String(opacity)
+          } else {
+            const fadeT = (progress - 0.15) / 0.85
+            const easeIn = fadeT * fadeT * fadeT
+            path.style.opacity = String(Math.max(0, 0.9 - easeIn * 0.9))
+            const drift = easeIn * -6
+            const scaleDown = 1 - easeIn * 0.15
+            path.style.transform = `translateY(${drift}px) scale(${scaleDown})`
+          }
           path.style.strokeDashoffset = '0'
-          path.style.opacity = String(1 - easeIn)
-          /* Slight upward drift as ink evaporates */
-          const drift = easeIn * -3
-          path.style.transform = `translateY(${drift}px)`
         } else {
           /* ── Hidden (before draw or after evaporation) ── */
           path.style.strokeDashoffset = String(len)
           path.style.opacity = '0'
-          path.style.transform = ''
+          path.style.transform = 'scale(1)'
         }
       }
     }
@@ -243,6 +252,7 @@ export default function KanjiStrokes({ rhythmRef, className = '' }) {
                 style={{
                   opacity: 0,
                   willChange: 'opacity, transform',
+                  transformOrigin: 'center',
                 }}
               />
             )

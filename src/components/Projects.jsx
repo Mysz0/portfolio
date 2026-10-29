@@ -1,16 +1,16 @@
-import { useState, useRef, useCallback, useEffect, useMemo, Fragment } from 'react'
-import { motion, AnimatePresence, useSpring, useMotionValue } from 'framer-motion'
+import { useState, useRef, useEffect, useMemo, Fragment } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import WindText from './WindText'
 
 /* ── Occult character set for demon-scramble ──────────── */
 const OCCULT_CHARS = [
   // Elder Futhark runes
-  'ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ','ᛁ','ᛃ','ᛇ','ᛈ','ᛉ','ᛊ','ᛏ','ᛒ','ᛗ','ᛚ','ᛜ','ᛞ','ᛟ',
+  'ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛇ', 'ᛈ', 'ᛉ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛗ', 'ᛚ', 'ᛜ', 'ᛞ', 'ᛟ',
   // Dark kanji
-  '亡','魂','鬼','邪','闇','影','夢','幽','冥','呪',
+  '亡', '魂', '鬼', '邪', '闇', '影', '夢', '幽', '冥', '呪',
   // Occult symbols
-  'ψ','Ω','ξ','ζ','∞','◊','☽',
+  'ψ', 'Ω', 'ξ', 'ζ', '∞', '◊', '☽',
 ]
 
 /* ── DemonText V3 — pure CSS transition crossfade ─────────
@@ -101,21 +101,36 @@ const tabs = [
     items: [
       {
         title: 'Urban Radar',
-        desc: 'A location-based social ecosystem. Built with a custom real-time theme engine that morphs the entire UI between atmospheric states.',
+        desc: 'A location game for the streets you already walk. Places around you show up as nodes. Walk within 20 m, claim it on the spot, and come back tomorrow to keep your streak.',
+        highlights: [
+          'Live map of claimable nodes where the ground you hold turns green',
+          'UrbanCard with handle, XP and streak that venues scan for rewards',
+          'Daily streaks, with Streak Freeze for the days you miss',
+        ],
         tech: ['React', 'Three.js', 'Framer Motion'],
         link: 'https://urabanradar.app',
         year: '2025/26',
       },
       {
         title: 'Digital Sanctuary',
-        desc: 'An immersive portfolio experience exploring atmospheric navigation and GPU-accelerated visuals.',
-        tech: ['Vite', 'Three.js', 'ShaderLab'],
+        desc: 'This site. An immersive portfolio exploring atmospheric navigation and GPU-accelerated visuals, built to feel calm rather than loud.',
+        highlights: [
+          'Hand-written GLSL background that shifts as you scroll',
+          'Kanji drawn stroke by stroke from KanjiVG data',
+          'Quill cursor trail and wind that kicks up on fast scrolls',
+        ],
+        tech: ['Vite', 'Three.js', 'GLSL'],
         link: 'https://me.hyruki.cc',
         year: '2026',
       },
       {
         title: 'Peek',
-        desc: 'A native macOS app that transforms the MacBook notch into a Dynamic Island with media controls, calendar, and file shelf.',
+        desc: 'A native macOS app that turns the MacBook notch into a Dynamic Island, so the dead space at the top of the screen becomes something useful.',
+        highlights: [
+          'Media controls that live in the notch',
+          'Calendar at a glance',
+          'A file shelf for drag-and-drop between apps',
+        ],
         tech: ['Swift', 'SwiftUI', 'AppKit'],
         link: 'https://peek.hyruki.cc',
         year: '2026',
@@ -128,14 +143,24 @@ const tabs = [
     items: [
       {
         title: 'Developer Core',
-        desc: 'High-performance utilities focused on speed and minimal cognitive load.',
+        desc: 'Browser utilities where no data leaves your device. Fast, keyboard-first, nothing to sign up for.',
+        highlights: [
+          'Eleven tools: palettes, passwords, QR, JSON, diff, markdown and more',
+          'Describe a vibe and get a matching five-colour palette',
+          'Press / anywhere to search',
+        ],
         tech: ['React', 'Bun', 'ShadCN'],
         link: 'https://tools.hyruki.cc',
         year: '2026',
       },
       {
         title: 'Stack Config',
-        desc: 'Visual environment architect for composing development stacks and generation scripts.',
+        desc: 'Select your technologies, get the commands, ship it. A visual architect for composing a dev stack.',
+        highlights: [
+          'Runtimes from Node and Bun to Go and Rust',
+          'Frontend, styling and backend picks in one pass',
+          'Outputs install commands and setup scripts',
+        ],
         tech: ['React', 'Bun', 'Tailwind'],
         link: 'https://tech.hyruki.cc',
         year: '2026',
@@ -144,70 +169,11 @@ const tabs = [
   },
 ]
 
-function ProjectRow({ p, idx, sectionVisible }) {
-  const ref = useRef(null)
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-  const springX = useSpring(x, { stiffness: 180, damping: 25, mass: 0.4 })
-  const springY = useSpring(y, { stiffness: 180, damping: 25, mass: 0.4 })
-  const isHovered = useRef(false)
-  const rafId = useRef(null)
-  const pollId = useRef(null)
-
-  // Idle micro-sway — pauses when section is offscreen
-  useEffect(() => {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReduced) return
-
-    const phase = idx * 1.8
-    function tick(now) {
-      if (!sectionVisible.current) {
-        rafId.current = null
-        pollId.current = setTimeout(() => {
-          rafId.current = requestAnimationFrame(tick)
-        }, 500)
-        return
-      }
-      rafId.current = requestAnimationFrame(tick)
-      if (isHovered.current) return
-      const t = now / 1000
-      x.set(Math.sin(t * 0.4 + phase) * 3)
-      y.set(Math.cos(t * 0.3 + phase) * 1.5)
-    }
-    rafId.current = requestAnimationFrame(tick)
-    return () => {
-      if (rafId.current) cancelAnimationFrame(rafId.current)
-      if (pollId.current) clearTimeout(pollId.current)
-    }
-  }, [idx, x, y, sectionVisible])
-
-  const handleMouseMove = useCallback((e) => {
-    if (!ref.current) return
-    isHovered.current = true
-    const rect = ref.current.getBoundingClientRect()
-    const mx = (e.clientX - rect.left) / rect.width - 0.5
-    const my = (e.clientY - rect.top) / rect.height - 0.5
-    x.set(mx * 8)
-    y.set(my * 5)
-  }, [x, y])
-
-  const handleMouseLeave = useCallback(() => {
-    isHovered.current = false
-  }, [])
-
+function ProjectRow({ p, idx }) {
   return (
-    <motion.div
-      ref={ref}
-      className="group grid md:grid-cols-12 gap-8 items-start border-b border-[var(--border)] pb-12 cursor-default"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ x: springX, y: springY }}
-    >
+    <div className="group grid md:grid-cols-12 gap-8 items-start border-b border-[var(--border)] pb-12">
       <div className="md:col-span-1">
-        <span
-          className="text-[var(--accent)] font-mono text-xs opacity-40 group-hover:opacity-100 transition-opacity duration-500 inline-block breathe-ambient"
-          style={{ animationDelay: `${-idx * 3}s` }}
-        >
+        <span className="text-[var(--accent)] font-mono text-xs opacity-40 group-hover:opacity-100 transition-opacity duration-500">
           0{idx + 1}
         </span>
       </div>
@@ -218,20 +184,22 @@ function ProjectRow({ p, idx, sectionVisible }) {
         <p className="text-[var(--text-body)] text-lg leading-relaxed max-w-xl">
           <DemonText text={p.desc} />
         </p>
+        <ul className="space-y-2 text-[var(--text-body)] max-w-xl">
+          {p.highlights.map((h) => (
+            <li key={h} className="flex gap-3">
+              <span className="text-[var(--accent)] select-none" aria-hidden="true">・</span>
+              <span>{h}</span>
+            </li>
+          ))}
+        </ul>
         <div className="flex flex-wrap gap-3">
-          {p.tech.map((t, tIdx) => (
-            <motion.span
+          {p.tech.map((t) => (
+            <span
               key={t}
               className="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] px-3 py-1 border border-[var(--border)] group-hover:border-[var(--border-hover)] transition-colors duration-500"
-              style={{
-                animation: 'sway 7s ease-in-out infinite',
-                animationDelay: `${-tIdx * 2}s`,
-                '--sway-distance': '1px',
-                '--sway-rotate': '0deg',
-              }}
             >
               {t}
-            </motion.span>
+            </span>
           ))}
         </div>
       </div>
@@ -239,40 +207,24 @@ function ProjectRow({ p, idx, sectionVisible }) {
         <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-4">
           {p.year}
         </span>
-        <motion.a
+        <a
           href={p.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-secondary inline-flex items-center gap-3 w-fit group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] transition-all duration-500"
-          whileHover={{ x: 3 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          className="btn-secondary inline-flex items-center gap-3 w-fit group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] transition-colors duration-500"
         >
           Explore <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-500" />
-        </motion.a>
+        </a>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
 export default function Projects() {
   const [active, setActive] = useState('featured')
   const activeTab = tabs.find((t) => t.id === active) ?? tabs[0]
-  const sectionRef = useRef(null)
-  const sectionVisible = useRef(false)
-
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => { sectionVisible.current = entry.isIntersecting },
-      { threshold: 0, rootMargin: '200px' },
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-
   return (
-    <section ref={sectionRef} id="projects" className="py-24 sm:py-48 max-w-5xl mx-auto px-6 sm:px-8">
+    <section id="projects" className="py-24 sm:py-48 max-w-5xl mx-auto px-6 sm:px-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 mb-24">
         <div className="max-w-2xl">
           <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-[var(--accent)] mb-6 breathe-ambient" style={{ animationDelay: '-2s' }}>Works</p>
@@ -280,7 +232,7 @@ export default function Projects() {
             Arrangements
           </WindText>
           <p className="text-[var(--text-body)] text-lg font-light leading-relaxed">
-            Each project is a small garden — shaped by constraints,
+            Each project is a small garden, shaped by constraints,
             defined by what was left out as much as what was put in.
           </p>
         </div>
@@ -289,9 +241,8 @@ export default function Projects() {
             <motion.button
               key={tab.id}
               onClick={() => setActive(tab.id)}
-              className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all duration-500 relative ${
-                active === tab.id ? 'text-[var(--text)]' : 'text-[var(--text-muted)] hover:text-[var(--text-body)]'
-              }`}
+              className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all duration-500 relative ${active === tab.id ? 'text-[var(--text)]' : 'text-[var(--text-muted)] hover:text-[var(--text-body)]'
+                }`}
               whileHover={{ y: -1 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             >
@@ -318,7 +269,7 @@ export default function Projects() {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
           {activeTab.items.map((p, idx) => (
-            <ProjectRow key={p.title} p={p} idx={idx} sectionVisible={sectionVisible} />
+            <ProjectRow key={p.title} p={p} idx={idx} />
           ))}
         </motion.div>
       </AnimatePresence>

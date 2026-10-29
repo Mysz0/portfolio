@@ -1,21 +1,13 @@
 import { useRef, useMemo, useEffect, Suspense } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-/* ── iOS detection ─────────────────────────────────────── */
 const getIsIOS = () => {
   if (typeof navigator === 'undefined') return false
   return (
     /iPad|iPhone|iPod/.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
   )
-}
-
-/* ── Mobile detection (for DPR cap) ────────────────────── */
-const getIsMobile = () => {
-  if (typeof navigator === 'undefined') return false
-  return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-    (navigator.maxTouchPoints > 1 && 'ontouchstart' in window)
 }
 
 const vertexShader = `
@@ -30,6 +22,7 @@ const fragmentShader = `
   uniform float uTime;
   uniform float uScroll;
   uniform vec3 uAccent;
+  uniform vec2 uRes;
   uniform float uIsIOS;
   uniform float uViewportH;
   uniform float uDpr;
@@ -86,7 +79,7 @@ const fragmentShader = `
     float t = uTime * 0.018;
     float s = uScroll;
 
-    // ── 3 octaves — larger scale for visible ink-cloud texture ──
+    // ── 3 octaves — same structure as before ──
     float n1 = snoise(vec3(uv * 1.2, t));
     float n2 = snoise(vec3(uv * 2.4 + 7.0, t * 0.8));
     float n3 = snoise(vec3(uv * 5.0 + 15.0, t * 0.5));
@@ -98,39 +91,75 @@ const fragmentShader = `
     float zSetup    = exp(-pow((s - 0.60) * 5.0, 2.0));
     float zContact  = exp(-pow((s - 0.88) * 5.0, 2.0));
 
-    // Temperature: 0 = cool slate, 1 = warm earth
-    float warmth = 0.0;
-    warmth += zAbout    * 0.5;
-    warmth += zProjects * 0.8;
-    warmth += zSetup    * 0.4;
-    warmth += zContact  * 0.2;
-    warmth = clamp(warmth, 0.0, 1.0);
+    // Contrast: 0 = flat, 1 = more tonal separation
+    float contrast = 0.0;
+    contrast += zAbout    * 0.4;
+    contrast += zProjects * 0.7;
+    contrast += zSetup    * 0.3;
+    contrast += zContact  * 0.2;
+    contrast = clamp(contrast, 0.0, 1.0);
 
-    // Accent intensity (red glow strongest in Projects + Contact zones)
-    float accentStr = zProjects * 0.35 + zContact * 0.2;
+    // Accent intensity (subtle ink bleed)
+    float accentStr = zProjects * 0.2 + zContact * 0.12;
 
-    // ── Base: cool dark ↔ warm dark, with visible noise variation ──
-    vec3 coolDark  = vec3(0.078, 0.078, 0.075);
-    vec3 warmDark  = vec3(0.085, 0.075, 0.065);
-    vec3 coolLight = vec3(0.13,  0.14,  0.18);
-    vec3 warmLight = vec3(0.22,  0.17,  0.13);
+    // ── Grayscale concrete palette ──
+    vec3 coolGray  = vec3(0.082, 0.082, 0.080);
+    vec3 warmGray  = vec3(0.090, 0.088, 0.084);
+    vec3 lightCool = vec3(0.14, 0.14, 0.135);
+    vec3 lightWarm = vec3(0.19, 0.185, 0.18);
 
-    vec3 dark  = mix(coolDark,  warmDark,  warmth);
-    vec3 light = mix(coolLight, warmLight, warmth);
+    vec3 dark  = mix(coolGray,  warmGray,  contrast);
+    vec3 light = mix(lightCool, lightWarm, contrast);
 
-    // Noise blends between dark and light
     vec3 base = mix(dark, light, noise);
 
-    // ── Accent glow — red ink bleeding through the surface ──
+    // ── Accent bleed — subtle ink ──
     base += uAccent * accentStr * noise * noise;
 
-    // ── Scroll-following warm band ──
+    // ── Scroll-following band ──
     float band = exp(-pow((uv.y - s) * 2.5, 2.0));
-    base += mix(vec3(0.035, 0.025, 0.018), vec3(0.06, 0.035, 0.018), warmth) * band;
+    base += vec3(0.025, 0.025, 0.024) * band * (0.4 + contrast * 0.6);
 
-    // ── Slow horizontal drift tied to scroll ──
+    // ── Slow horizontal drift ──
     float drift = snoise(vec3(uv.x * 2.0 + s * 2.0, uv.y * 1.0, t * 0.5)) * 0.5 + 0.5;
-    base += vec3(0.02, 0.016, 0.012) * drift * (0.3 + warmth * 0.7);
+    base += vec3(0.018, 0.018, 0.017) * drift * (0.3 + contrast * 0.7);
+
+    // ── Moon in the night haze ──
+    // Screen-space so it stays round; sinks only slightly over the page
+    vec2 suv = gl_FragCoord.xy / uRes;
+    float aspect = uRes.x / uRes.y;
+    vec2 sp = vec2(suv.x * aspect, suv.y);
+    vec2 mc = vec2(aspect * 0.8, 0.78 - s * 0.16);
+    vec2 md2 = sp - mc;
+    float md = length(md2);
+    float R = 0.068;
+    float aa = 1.5 / uRes.y * uDpr;
+    float disc = smoothstep(R + aa, R - aa, md);
+
+    // Surface: faint maria + limb darkening
+    float maria = snoise(vec3(md2 * 16.0, 1.7)) * 0.5 + 0.5;
+    float fine = snoise(vec3(md2 * 42.0, 4.2)) * 0.5 + 0.5;
+    float limb = sqrt(max(0.0, 1.0 - (md / R) * (md / R)));
+    vec3 moonCol = vec3(0.92, 0.89, 0.82);
+    vec3 surface = moonCol * (0.72 + 0.28 * limb) * (0.80 + 0.14 * (1.0 - maria) + 0.06 * fine);
+
+    // Cloud layer drifting across the sky
+    vec2 cp = vec2(sp.x * 1.4 - uTime * 0.012, sp.y * 3.2);
+    float cn = snoise(vec3(cp, t * 0.6)) * 0.55
+             + snoise(vec3(cp * 2.1 + 3.0, t)) * 0.3
+             + snoise(vec3(cp * 4.6 + 9.0, t * 1.4)) * 0.15;
+    float cloud = smoothstep(0.05, 0.6, cn);
+
+    // Moonlight: tight bloom + wide atmospheric halo
+    float bloom = exp(-md * md * 160.0);
+    float halo = exp(-md * md * 14.0);
+
+    // Clouds hide the disc but catch its light at their edges
+    float moonVis = disc * (1.0 - cloud * 0.85);
+    base = mix(base, surface, moonVis * 0.62);
+    base += moonCol * (bloom * 0.07 + halo * 0.05) * (1.0 - cloud * 0.4);
+    base += moonCol * cloud * exp(-md * md * 5.0) * 0.07;
+    base += vec3(0.010, 0.010, 0.009) * cloud;
 
     // ── Gentle vignette ──
     float vig = 1.0 - length((uv - 0.5) * 1.3);
@@ -138,20 +167,13 @@ const fragmentShader = `
     base *= mix(0.6, 1.0, vig);
 
     // ── iOS Safari chrome blending ──
-    // Safari draws opaque chrome (status bar, toolbar) filled with
-    // theme-color at screen edges. Gradually darken shader toward
-    // that same color so the boundary is nearly invisible.
-    // No zone math — just fade from canvas edges inward.
     if (uIsIOS > 0.5) {
-      vec3 chromeColor = vec3(0.07843, 0.07843, 0.07451); // exact #141413
+      vec3 chromeColor = vec3(0.07843, 0.07843, 0.07451);
       float cssY = gl_FragCoord.y / uDpr;
       float fromBottom = cssY;
       float fromTop = uViewportH - cssY;
-
-      // Large smooth fades — 120px bottom (toolbar), 80px top (status bar)
       float bottomFade = smoothstep(0.0, 120.0, fromBottom);
       float topFade = smoothstep(0.0, 80.0, fromTop);
-
       base = mix(chromeColor, base, bottomFade * topFade);
     }
 
@@ -178,12 +200,12 @@ function Scene() {
     uTime: { value: 0 },
     uScroll: { value: 0 },
     uAccent: { value: new THREE.Color('#B7372E') },
+    uRes: { value: new THREE.Vector2(1, 1) },
     uIsIOS: { value: isIOS ? 1.0 : 0.0 },
     uViewportH: { value: window.innerHeight },
     uDpr: { value: Math.min(Math.max(window.devicePixelRatio, 1), 1.5) },
   }), [isIOS])
 
-  /* Keep viewport height current on resize / toolbar change */
   useEffect(() => {
     if (!isIOS) return
     const update = () => {
@@ -192,7 +214,6 @@ function Scene() {
     }
     window.addEventListener('resize', update, { passive: true })
     window.addEventListener('orientationchange', update, { passive: true })
-    /* Visual Viewport API — tracks dynamic toolbar (iOS 26+) */
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', update, { passive: true })
     }
@@ -210,7 +231,7 @@ function Scene() {
     const u = meshRef.current.material.uniforms
     u.uTime.value = state.clock.elapsedTime
     u.uScroll.value = scrollRef.current
-    /* Sync actual DPR from renderer once (R3F may pick a different value) */
+    u.uRes.value.set(state.size.width * state.gl.getPixelRatio(), state.size.height * state.gl.getPixelRatio())
     if (!dprSynced.current) {
       u.uDpr.value = state.gl.getPixelRatio()
       dprSynced.current = true
@@ -231,18 +252,37 @@ function Scene() {
   )
 }
 
+/* Haze moves slowly — 30fps is indistinguishable and halves GPU time */
+function Throttle({ fps = 30 }) {
+  const invalidate = useThree((s) => s.invalidate)
+  useEffect(() => {
+    let id
+    let last = 0
+    const loop = (now) => {
+      id = requestAnimationFrame(loop)
+      if (now - last < 1000 / fps - 2) return
+      last = now
+      invalidate()
+    }
+    id = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(id)
+  }, [invalidate, fps])
+  return null
+}
+
 export default function ShaderBackground() {
-  const mobileDpr = useMemo(() => getIsMobile() ? [1, 1] : [1, 1.5], [])
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         gl={{ alpha: false, antialias: false, powerPreference: 'high-performance' }}
-        dpr={mobileDpr}
+        dpr={1}
+        frameloop="demand"
       >
         <Suspense fallback={null}>
           <Scene />
+          <Throttle />
         </Suspense>
       </Canvas>
     </div>

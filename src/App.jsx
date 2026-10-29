@@ -4,12 +4,13 @@ import Lenis from 'lenis'
 import Hero from './components/Hero'
 import About from './components/About'
 import Projects from './components/Projects'
-import Setup from './components/Setup'
 import Keyboards from './components/Keyboards'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import ScrollRevealText from './components/ScrollRevealText'
 import InkTrailCanvas from './components/InkTrailCanvas'
+import WindGust from './components/WindGust'
+import RainCanvas from './components/RainCanvas'
 
 const ShaderBackground = lazy(() => import('./components/ShaderBackground'))
 
@@ -129,7 +130,9 @@ export default function App() {
       <Suspense fallback={null}>
         <ShaderBackground />
       </Suspense>
+      <RainCanvas />
       <InkTrailCanvas />
+      <WindGust />
 
       <div
         className="relative min-h-screen text-[var(--text)] overflow-x-hidden selection:bg-[var(--accent)] selection:text-white"
@@ -144,7 +147,7 @@ export default function App() {
         <main className="relative z-10 space-y-0 pb-32">
           <Hero />
 
-          <Interstitial text="The empty space is not nothing — it is everything waiting." />
+          <Interstitial text="The empty space is not nothing. It is everything waiting." />
 
           <RevealSection depth={0.15}>
             <About />
@@ -154,12 +157,6 @@ export default function App() {
 
           <RevealSection depth={0.1}>
             <Projects />
-          </RevealSection>
-
-          <Interstitial text="The tools shape the hand that holds them." />
-
-          <RevealSection depth={0.2}>
-            <Setup />
           </RevealSection>
 
           <BreathingSeparator delay={-2} />

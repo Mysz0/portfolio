@@ -75,7 +75,7 @@ export default function Footer() {
         className="text-[10px] font-light tracking-[0.4em] text-[var(--text-muted)] breathe-ambient"
         style={{ animationDelay: '-7s', '--breathe-base-opacity': '0.5', '--breathe-peak-opacity': '0.7' }}
       >
-        &copy; {new Date().getFullYear()} &mdash; Tended with care
+        &copy; {new Date().getFullYear()} · Tended with care
       </p>
     </motion.footer>
   )

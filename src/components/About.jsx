@@ -93,13 +93,6 @@ export default function About() {
   const y = useTransform(scrollYProgress, [0, 1], [40, 0])
   const opacity = useTransform(scrollYProgress, [0, 1], [0, 1])
 
-  const skills = [
-    { label: 'Runtime', val: 'Bun / Node' },
-    { label: 'Interface', val: 'React' },
-    { label: 'Language', val: 'TypeScript' },
-    { label: 'Atmosphere', val: 'Three.js / GLSL' },
-  ]
-
   return (
     <section
       ref={ref}
@@ -118,14 +111,14 @@ export default function About() {
             <div className="relative pl-10">
               <InkBrushBorder scrollYProgress={scrollYProgress} />
               <p className="text-[var(--text-body)] text-xl sm:text-2xl font-light leading-relaxed italic">
-                <BreathingQuote text="A zen garden doesn't demand your attention — it earns it through restraint. I build interfaces the same way." />
+                <BreathingQuote text="A zen garden doesn't demand your attention. It earns it through restraint. I build interfaces the same way." />
               </p>
             </div>
 
             {/* Prose columns with block-level breathing */}
             <div className="grid sm:grid-cols-2 gap-16 text-[var(--text-body)] text-lg leading-relaxed">
               <BreathingColumn delay={-2}>
-                There is a Japanese concept — <em>ma</em>, the purposeful void.
+                There is a Japanese concept called <em>ma</em>, the purposeful void.
                 The silence between notes that gives music its shape.
                 I pursue that same emptiness in code: removing
                 until only the essential remains.
@@ -133,47 +126,11 @@ export default function About() {
               <BreathingColumn delay={-7}>
                 Performance is not a metric to me, it is a feeling.
                 When an interface responds before you finish thinking,
-                when a transition feels like breathing — that is
+                when a transition feels like breathing, that is
                 the craft I care about.
               </BreathingColumn>
             </div>
           </div>
-        </div>
-
-        {/* Skill cards with float animation on outer wrapper, spring hover on inner */}
-        <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-[var(--border)] pt-12">
-          {skills.map((s, idx) => (
-            <div
-              key={s.label}
-              className="skill-float"
-              style={{
-                '--float-y': `${-1.5 - (idx % 2) * 1}px`,
-                '--float-x': `${0.8 + (idx % 3) * 0.4}px`,
-                '--float-duration': `${9 + idx * 1.5}s`,
-                '--float-delay': `${-idx * 2.5}s`,
-              }}
-            >
-              <motion.div
-                className="group"
-                whileHover={{ y: -2 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              >
-                <div
-                  className="text-[10px] font-light uppercase tracking-widest text-[var(--text-muted)] mb-2 group-hover:text-[var(--accent)] transition-colors duration-500 breathe-ambient"
-                  style={{
-                    animationDelay: `${-idx * 2}s`,
-                    '--breathe-base-opacity': '0.6',
-                    '--breathe-peak-opacity': '0.9',
-                  }}
-                >
-                  {s.label}
-                </div>
-                <div className="text-sm font-bold uppercase tracking-tight text-[var(--text)] group-hover:translate-x-1 transition-transform duration-500">
-                  {s.val}
-                </div>
-              </motion.div>
-            </div>
-          ))}
         </div>
       </motion.div>
     </section>

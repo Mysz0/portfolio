@@ -71,6 +71,7 @@ export default function WindText({
 
   // Per-character spring state
   const charStates = useRef(null)
+  const prevTransforms = useRef(null)
 
   // SVG filter animated values (alive mode only)
   const filterState = useRef({
@@ -102,6 +103,7 @@ export default function WindText({
   // Initialize per-character spring states
   useEffect(() => {
     charStates.current = Array.from({ length: text.length }, () => ({ ...REST }))
+    prevTransforms.current = new Array(text.length).fill(null)
   }, [text.length])
 
   // ── Shared character update logic ────────────────────
@@ -199,13 +201,20 @@ export default function WindText({
         allSettled = false
       }
 
-      // Apply to DOM
+      // Apply to DOM (skip if unchanged)
       const tx = state.x + state.spreadX
       const ty = state.y + state.liftY
+      const tStr = `translate3d(${tx.toFixed(2)}px,${ty.toFixed(2)}px,0) rotate(${state.rot.toFixed(3)}deg) scale(${state.scale.toFixed(4)})`
+      const fStr = `blur(${(Math.round(Math.max(0, state.blur) * 10) / 10).toFixed(1)}px) brightness(${(Math.round(state.brightness * 50) / 50).toFixed(2)})`
+      const oStr = state.opacity.toFixed(3)
 
-      charEl.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) rotate(${state.rot.toFixed(3)}deg) scale(${state.scale.toFixed(4)})`
-      charEl.style.filter = `blur(${Math.max(0, state.blur).toFixed(2)}px) brightness(${state.brightness.toFixed(3)})`
-      charEl.style.opacity = state.opacity.toFixed(3)
+      const prev = prevTransforms.current[i]
+      if (prev && prev[0] === tStr && prev[1] === fStr && prev[2] === oStr) continue
+
+      if (!prev || prev[0] !== tStr) charEl.style.transform = tStr
+      if (!prev || prev[1] !== fStr) charEl.style.filter = fStr
+      if (!prev || prev[2] !== oStr) charEl.style.opacity = oStr
+      prevTransforms.current[i] = [tStr, fStr, oStr]
     }
 
     return allSettled
@@ -217,6 +226,9 @@ export default function WindText({
     if (prefersReduced.current) return
 
     let lastTime = performance.now()
+    let smoothDt = 1 / 60
+    let filterUpdateTimer = 0
+    const filterAttrs = { freq: null, seed: null, disp: null }
     const turbNode = document.getElementById(`${svgFilterId.current}-turb`)
     const dispNode = document.getElementById(`${svgFilterId.current}-disp`)
     const isVisibleRef = { current: true }
@@ -247,7 +259,8 @@ export default function WindText({
 
       const dtRaw = (now - lastTime) / 1000
       lastTime = now
-      const dt = Math.min(dtRaw, 0.05)
+      smoothDt = smoothDt * 0.9 + Math.min(dtRaw, 0.05) * 0.1
+      const dt = smoothDt
 
       if (!containerRef.current || !charStates.current) return
 
@@ -263,17 +276,20 @@ export default function WindText({
       const mouseInside = mouseLocal.current.inside
       const time = now / 1000
 
-      // ── SVG turbulence ──
+      // ── SVG turbulence (throttled) ──
+      filterUpdateTimer += dt
+      const updateFilter = filterUpdateTimer > 0.2
+      if (updateFilter) filterUpdateTimer = 0
+
       const fs = filterState.current
       const targetFreq = 0.012 + Math.sin(time * 0.3) * 0.004
 
-      // Modulate displacement based on shared kanji rhythm
       let baseDisp = 6
       if (rhythmRef?.current) {
         const elapsed = (now - rhythmRef.current.origin) / 1000
         const ct = ((elapsed % 33) + 33) % 33
-        if (ct < 8) baseDisp = 5            // drawing phase — calmer
-        else if (ct >= 20 && ct < 28) baseDisp = 8  // evaporation — sympathetic turbulence
+        if (ct < 8) baseDisp = 5
+        else if (ct >= 20 && ct < 28) baseDisp = 8
       }
       const targetDisp = mouseInside ? 2 : baseDisp
       ;[fs.baseFreq, fs.baseFreqVel] = springStep(fs.baseFreq, fs.baseFreqVel, targetFreq, 2, 3, dt)
@@ -285,12 +301,21 @@ export default function WindText({
         fs.seed = (fs.seed % 100) + 1
       }
 
-      if (turbNode) {
-        turbNode.setAttribute('baseFrequency', `${fs.baseFreq} ${fs.baseFreq * 1.3}`)
-        turbNode.setAttribute('seed', String(fs.seed))
-      }
-      if (dispNode) {
-        dispNode.setAttribute('scale', String(fs.displacement))
+      if (updateFilter) {
+        // feTurbulence re-renders on any attribute write, so skip no-op writes
+        const freqStr = `${fs.baseFreq.toFixed(3)} ${fs.baseFreq.toFixed(3)}`
+        const dispStr = String(Math.round(fs.displacement * 2) / 2)
+        const last = filterAttrs
+        if (turbNode && (last.freq !== freqStr || last.seed !== fs.seed)) {
+          turbNode.setAttribute('baseFrequency', freqStr)
+          turbNode.setAttribute('seed', String(fs.seed))
+          last.freq = freqStr
+          last.seed = fs.seed
+        }
+        if (dispNode && last.disp !== dispStr) {
+          dispNode.setAttribute('scale', dispStr)
+          last.disp = dispStr
+        }
       }
 
       // ── Per-character update ──
@@ -399,7 +424,7 @@ export default function WindText({
                 id={`${svgFilterId.current}-turb`}
                 type="fractalNoise"
                 baseFrequency="0.015 0.0195"
-                numOctaves="3"
+                numOctaves="2"
                 seed="1"
                 result="noise"
               />
@@ -432,7 +457,7 @@ export default function WindText({
             data-wind
             style={{
               display: 'inline-block',
-              willChange: 'transform, filter, opacity',
+              willChange: 'transform',
               verticalAlign: 'baseline',
               opacity: 0.85,
               filter: 'blur(0.6px) brightness(0.88)',

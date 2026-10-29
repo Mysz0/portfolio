@@ -36,6 +36,12 @@ const keyboards = [
     specs: ['Napworks Tactile', 'YIKB Stabs', 'PBTfans Classic'],
     year: '2025',
   },
+  {
+    title: 'Tofu65 v3',
+    desc: 'Classic 65% in GMK Violet Alert, with smooth linears and tuned stabs.',
+    specs: ['Gateron Smoothie', 'Typeplus × YIKB', 'GMK Violet Alert'],
+    year: '2026',
+  },
 ]
 
 /* Spring-physics tilt card — organic motion with mass and damping */
@@ -203,7 +209,7 @@ export default function Keyboards() {
         </p>
       </div>
 
-      <div className="grid gap-1 lg:grid-cols-3 border-t border-[var(--border)]">
+      <div className="grid gap-1 md:grid-cols-2 border-t border-[var(--border)]">
         {keyboards.map((kb, idx) => (
           <motion.div
             key={kb.title}

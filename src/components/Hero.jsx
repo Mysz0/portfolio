@@ -4,7 +4,7 @@ import WindText from './WindText'
 import KanjiStrokes from './KanjiStrokes'
 
 // Split subtitle into words for word-by-word breathing
-const SUBTITLE_WORDS = 'Crafting quiet interfaces where every element earns its place — like stones in a garden.'.split(' ')
+const SUBTITLE_WORDS = 'Crafting quiet interfaces where every element earns its place, like stones in a garden.'.split(' ')
 
 export default function Hero() {
   const ref = useRef(null)
@@ -63,7 +63,7 @@ export default function Hero() {
           animate={{ opacity: 1 }}
           transition={{ duration: 2, delay: 0.8 }}
           className="text-lg sm:text-xl text-[var(--text-body)] mb-20 leading-relaxed max-w-md mx-auto font-light"
-          aria-label="Crafting quiet interfaces where every element earns its place — like stones in a garden."
+          aria-label="Crafting quiet interfaces where every element earns its place, like stones in a garden."
         >
           {SUBTITLE_WORDS.map((word, i) => (
             <span
