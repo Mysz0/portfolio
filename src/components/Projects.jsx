@@ -120,7 +120,7 @@ const tabs = [
           'Quill cursor trail and wind that kicks up on fast scrolls',
         ],
         tech: ['Vite', 'Three.js', 'GLSL'],
-        link: 'https://me.hyruki.cc',
+        link: 'https://hyruki.cc',
         year: '2026',
       },
       {
@@ -132,7 +132,7 @@ const tabs = [
           'A file shelf for drag-and-drop between apps',
         ],
         tech: ['Swift', 'SwiftUI', 'AppKit'],
-        link: 'https://peek.hyruki.cc',
+        link: '/peek',
         year: '2026',
       },
     ],
@@ -209,8 +209,9 @@ function ProjectRow({ p, idx }) {
         </span>
         <a
           href={p.link}
-          target="_blank"
-          rel="noopener noreferrer"
+          // Own pages (like /peek) open in place; other sites in a new tab
+          target={p.link.startsWith('http') ? '_blank' : undefined}
+          rel={p.link.startsWith('http') ? 'noopener noreferrer' : undefined}
           className="btn-secondary inline-flex items-center gap-3 w-fit group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] transition-colors duration-500"
         >
           Explore <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-500" />
