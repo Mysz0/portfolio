@@ -77,7 +77,7 @@ const Interstitial = ({ text }) => (
   <div className="max-w-5xl mx-auto px-8 py-48 text-center">
     <ScrollRevealText
       text={text}
-      className="font-light tracking-[0.5em] uppercase text-[11px] text-[var(--text-muted)]"
+      className="font-accent italic text-xl sm:text-2xl text-[var(--text-muted)]"
     />
   </div>
 )

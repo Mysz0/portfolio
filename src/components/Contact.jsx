@@ -10,7 +10,7 @@ function ZenInput({ label, name, value, onChange, placeholder, type = 'text', re
   return (
     <div className="space-y-2 group relative">
       <label
-        className={`text-[10px] font-bold uppercase tracking-widest transition-all duration-700 ${
+        className={`text-xs font-medium transition-colors duration-700 ${
           focused ? 'text-[var(--accent)]' : 'text-[var(--text-muted)]'
         }`}
       >
@@ -74,7 +74,7 @@ export default function Contact() {
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="text-center mb-20">
-          <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-[var(--accent)] mb-6 breathe-ambient" style={{ animationDelay: '-4s' }}>Connection</p>
+          <p className="eyebrow mb-6 justify-center"><span lang="ja">話</span>Connection</p>
           <WindText className="text-5xl sm:text-7xl heading-accent mb-8">
             Begin a Dialogue
           </WindText>

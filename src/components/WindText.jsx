@@ -77,7 +77,6 @@ export default function WindText({
   const filterState = useRef({
     baseFreq: 0.015, baseFreqVel: 0,
     displacement: 6, displacementVel: 0,
-    seed: 1, seedTimer: 0,
   })
 
   // For non-alive mode: track whether hover rAF is running
@@ -205,7 +204,7 @@ export default function WindText({
       const tx = state.x + state.spreadX
       const ty = state.y + state.liftY
       const tStr = `translate3d(${tx.toFixed(2)}px,${ty.toFixed(2)}px,0) rotate(${state.rot.toFixed(3)}deg) scale(${state.scale.toFixed(4)})`
-      const fStr = `blur(${(Math.round(Math.max(0, state.blur) * 10) / 10).toFixed(1)}px) brightness(${(Math.round(state.brightness * 50) / 50).toFixed(2)})`
+      const fStr = `blur(${Math.max(0, state.blur).toFixed(2)}px) brightness(${state.brightness.toFixed(3)})`
       const oStr = state.opacity.toFixed(3)
 
       const prev = prevTransforms.current[i]
@@ -227,8 +226,7 @@ export default function WindText({
 
     let lastTime = performance.now()
     let smoothDt = 1 / 60
-    let filterUpdateTimer = 0
-    const filterAttrs = { freq: null, seed: null, disp: null }
+    const filterAttrs = { freq: null, disp: null }
     const turbNode = document.getElementById(`${svgFilterId.current}-turb`)
     const dispNode = document.getElementById(`${svgFilterId.current}-disp`)
     const isVisibleRef = { current: true }
@@ -276,11 +274,10 @@ export default function WindText({
       const mouseInside = mouseLocal.current.inside
       const time = now / 1000
 
-      // ── SVG turbulence (throttled) ──
-      filterUpdateTimer += dt
-      const updateFilter = filterUpdateTimer > 0.2
-      if (updateFilter) filterUpdateTimer = 0
-
+      // ── SVG turbulence ──
+      // The filter covers the whole heading, so the animated letters already
+      // re-render it every frame; throttling the attributes saved nothing and
+      // made the distortion step. Update smoothly, skipping no-op writes.
       const fs = filterState.current
       const targetFreq = 0.012 + Math.sin(time * 0.3) * 0.004
 
@@ -295,22 +292,15 @@ export default function WindText({
       ;[fs.baseFreq, fs.baseFreqVel] = springStep(fs.baseFreq, fs.baseFreqVel, targetFreq, 2, 3, dt)
       ;[fs.displacement, fs.displacementVel] = springStep(fs.displacement, fs.displacementVel, targetDisp, 4, 5, dt)
 
-      fs.seedTimer += dt
-      if (fs.seedTimer > 3) {
-        fs.seedTimer = 0
-        fs.seed = (fs.seed % 100) + 1
-      }
-
-      if (updateFilter) {
-        // feTurbulence re-renders on any attribute write, so skip no-op writes
-        const freqStr = `${fs.baseFreq.toFixed(3)} ${fs.baseFreq.toFixed(3)}`
-        const dispStr = String(Math.round(fs.displacement * 2) / 2)
+      // Seed stays fixed: a new seed is a brand-new noise pattern, which
+      // reads as a jump no matter how it's eased
+      {
+        const freqStr = `${fs.baseFreq.toFixed(4)} ${fs.baseFreq.toFixed(4)}`
+        const dispStr = fs.displacement.toFixed(2)
         const last = filterAttrs
-        if (turbNode && (last.freq !== freqStr || last.seed !== fs.seed)) {
+        if (turbNode && last.freq !== freqStr) {
           turbNode.setAttribute('baseFrequency', freqStr)
-          turbNode.setAttribute('seed', String(fs.seed))
           last.freq = freqStr
-          last.seed = fs.seed
         }
         if (dispNode && last.disp !== dispStr) {
           dispNode.setAttribute('scale', dispStr)

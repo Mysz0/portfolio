@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Sora", system-ui, sans-serif;
+  --font-sans: "Sora", "Noto Sans JP", "Noto Sans Runic", "Noto Sans Symbols 2", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
-  --font-accent: "Cormorant Garamond", Georgia, serif;
+  --font-accent: "Cormorant Garamond", "Noto Serif JP", "Noto Sans Runic", "Noto Sans Symbols 2", Georgia, serif;
 
   --color-plum: #8B5CF6;
   --color-plum-deep: #6D28D9;
@@ -448,38 +448,33 @@ body {
 
 /* ============ BUTTONS ============ */
 
+/* Shared pill shape so both buttons match in size */
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-width: 10.5rem;
+  height: 3.25rem;
+  padding: 0 1.75rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.btn-primary:active,
+.btn-secondary:active {
+  transform: scale(0.97);
+}
+
 .btn-primary {
   background: var(--text);
   color: var(--bg);
-  padding: 1.25rem 3rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  border: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-primary::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  z-index: 0;
-}
-
-.btn-primary:hover::after {
-  transform: scaleX(1);
-}
-
-.btn-primary:hover {
-  color: #fff;
-  transform: translateY(-2px);
 }
 
 .btn-primary span {
@@ -488,19 +483,118 @@ body {
 }
 
 .btn-secondary {
-  border: 1px solid var(--border);
-  padding: 1.25rem 3rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  border-color: var(--border-hover);
+  color: var(--text);
 }
 
-.btn-secondary:hover {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-secondary:hover {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+}
+
+/* Section label: one kanji + a plain word, no tracked caps */
+.eyebrow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6em;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.eyebrow [lang="ja"] {
+  color: var(--accent);
+  font-size: 1.05rem;
+}
+
+/* Small keycap for the keyboard hint */
+.keycap {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-hover);
+  border-bottom-width: 3px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+/* Tanuki emotion marks: anime joy lines radiating from the head.
+   Draw outward one by one once the head has turned; retract fast. */
+.tanuki-joy {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.tanuki-joy line {
+  stroke: var(--text);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition: stroke-dashoffset 140ms ease-in, opacity 140ms ease-in;
+}
+
+.tanuki-joy[data-show="true"] line {
+  stroke-dashoffset: 0;
+  opacity: 0.92;
+  transition:
+    stroke-dashoffset 200ms cubic-bezier(0.23, 1, 0.32, 1) calc(90ms + var(--i) * 50ms),
+    opacity 60ms ease-out calc(90ms + var(--i) * 50ms);
+}
+
+/* Heart by the tanuki's face on click: pop with a little overshoot,
+   one heartbeat, then drift up and fade */
+.tanuki-heart {
+  position: absolute;
+  top: 13%;
+  width: 6.5%;
+  fill: var(--accent);
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: 50% 80%;
+  animation: tanuki-heart 1500ms forwards;
+}
+
+@keyframes tanuki-heart {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.5) rotate(-14deg);
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  16% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(-10deg);
+    animation-timing-function: ease-in-out;
+  }
+  28% {
+    transform: translateY(-1px) scale(1.12) rotate(-10deg);
+    animation-timing-function: ease-in-out;
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1) rotate(-10deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.92) rotate(-4deg);
+  }
 }
 
 /* ============ REDUCED MOTION ============ */

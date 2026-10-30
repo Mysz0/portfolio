@@ -108,7 +108,7 @@ const tabs = [
           'Daily streaks, with Streak Freeze for the days you miss',
         ],
         tech: ['React', 'Three.js', 'Framer Motion'],
-        link: 'https://urabanradar.app',
+        link: 'https://urbnradar.com',
         year: '2025/26',
       },
       {
@@ -196,7 +196,7 @@ function ProjectRow({ p, idx }) {
           {p.tech.map((t) => (
             <span
               key={t}
-              className="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] px-3 py-1 border border-[var(--border)] group-hover:border-[var(--border-hover)] transition-colors duration-500"
+              className="text-xs font-medium text-[var(--text-muted)] px-3 py-1 rounded-full border border-[var(--border)] group-hover:border-[var(--border-hover)] transition-colors duration-500"
             >
               {t}
             </span>
@@ -204,7 +204,7 @@ function ProjectRow({ p, idx }) {
         </div>
       </div>
       <div className="md:col-span-4 md:text-right flex flex-col md:items-end gap-4">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-4">
+        <span className="text-xs font-medium text-[var(--text-muted)] mb-4">
           {p.year}
         </span>
         <a
@@ -227,7 +227,7 @@ export default function Projects() {
     <section id="projects" className="py-24 sm:py-48 max-w-5xl mx-auto px-6 sm:px-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 mb-24">
         <div className="max-w-2xl">
-          <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-[var(--accent)] mb-6 breathe-ambient" style={{ animationDelay: '-2s' }}>Works</p>
+          <p className="eyebrow mb-6"><span lang="ja">作</span>Works</p>
           <WindText className="text-5xl sm:text-7xl heading-accent mb-8">
             Arrangements
           </WindText>
@@ -241,7 +241,7 @@ export default function Projects() {
             <motion.button
               key={tab.id}
               onClick={() => setActive(tab.id)}
-              className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all duration-500 relative ${active === tab.id ? 'text-[var(--text)]' : 'text-[var(--text-muted)] hover:text-[var(--text-body)]'
+              className={`pb-4 text-sm font-medium transition-colors duration-500 relative ${active === tab.id ? 'text-[var(--text)]' : 'text-[var(--text-muted)] hover:text-[var(--text-body)]'
                 }`}
               whileHover={{ y: -1 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}

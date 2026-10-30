@@ -183,22 +183,16 @@ export default function KanjiStrokes({ rhythmRef, className = '' }) {
           path.style.opacity = '1'
           path.style.transform = 'scale(1)'
         } else if (ct >= st.evapStart && ct < st.evapEnd) {
-          /* ── Pop + evaporation ── */
+          /* ── Evaporation: one continuous curve — a soft swell, then the
+             stroke drifts up, shrinks and fades. No phase hand-off, so
+             nothing snaps mid-way. ── */
           const progress = (ct - st.evapStart) / (st.evapEnd - st.evapStart)
-          if (progress < 0.15) {
-            const popT = progress / 0.15
-            const scale = 1 + popT * 0.35
-            const opacity = 1 - popT * 0.1
-            path.style.transform = `scale(${scale})`
-            path.style.opacity = String(opacity)
-          } else {
-            const fadeT = (progress - 0.15) / 0.85
-            const easeIn = fadeT * fadeT * fadeT
-            path.style.opacity = String(Math.max(0, 0.9 - easeIn * 0.9))
-            const drift = easeIn * -6
-            const scaleDown = 1 - easeIn * 0.15
-            path.style.transform = `translateY(${drift}px) scale(${scaleDown})`
-          }
+          const swell = Math.sin(Math.min(progress / 0.3, 1) * Math.PI / 2)  // ease-out to 1
+          const settle = smoothstep((progress - 0.2) / 0.8)
+          const scale = 1 + swell * 0.1 - settle * 0.22
+          const drift = -6 * settle
+          path.style.transform = `translateY(${drift.toFixed(2)}px) scale(${scale.toFixed(4)})`
+          path.style.opacity = String((1 - settle).toFixed(4))
           path.style.strokeDashoffset = '0'
         } else {
           /* ── Hidden (before draw or after evaporation) ── */
@@ -252,6 +246,8 @@ export default function KanjiStrokes({ rhythmRef, className = '' }) {
                 style={{
                   opacity: 0,
                   willChange: 'opacity, transform',
+                  // Scale each stroke around itself, not the character box
+                  transformBox: 'fill-box',
                   transformOrigin: 'center',
                 }}
               />

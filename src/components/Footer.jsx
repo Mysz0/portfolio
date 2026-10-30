@@ -44,7 +44,7 @@ function BreathingIcon({ icon: Icon, label, href, delay }) {
       >
         <Icon size={20} className="group-hover:text-[var(--accent)] transition-colors duration-500" />
       </motion.div>
-      <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-500 whitespace-nowrap">
+      <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-medium opacity-0 group-hover:opacity-100 transition-all duration-500 whitespace-nowrap">
         {label}
       </span>
     </motion.a>
@@ -72,7 +72,7 @@ export default function Footer() {
         ))}
       </div>
       <p
-        className="text-[10px] font-light tracking-[0.4em] text-[var(--text-muted)] breathe-ambient"
+        className="text-xs text-[var(--text-muted)] breathe-ambient"
         style={{ animationDelay: '-7s', '--breathe-base-opacity': '0.5', '--breathe-peak-opacity': '0.7' }}
       >
         &copy; {new Date().getFullYear()} · Tended with care

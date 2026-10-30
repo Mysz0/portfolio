@@ -199,7 +199,7 @@ export default function Keyboards() {
       <div ref={poolRef} className="absolute inset-0 pointer-events-none overflow-hidden z-10" aria-hidden="true" />
 
       <div className="max-w-2xl mb-24">
-        <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-[var(--accent)] mb-6 breathe-ambient" style={{ animationDelay: '-3s' }}>Touch</p>
+        <p className="eyebrow mb-6"><span lang="ja">鍵</span>Touch</p>
         <WindText className="text-5xl sm:text-7xl heading-accent mb-8">
           Instruments
         </WindText>
@@ -207,6 +207,13 @@ export default function Keyboards() {
           The keyboard is where thought meets matter.
           Each build is a study in sound, weight, and feel.
         </p>
+        {/* Keyboard hint, only on devices with a physical keyboard */}
+        {hasKeyboard && (
+          <p className="mt-8 flex items-center gap-3 text-base text-[var(--text-muted)]">
+            <kbd className="keycap" lang="ja">か</kbd>
+            Type anything here. Each key lands as its kana.
+          </p>
+        )}
       </div>
 
       <div className="grid gap-1 md:grid-cols-2 border-t border-[var(--border)]">
@@ -225,7 +232,7 @@ export default function Keyboards() {
             >
               <div className="flex justify-between items-start mb-12">
                 <span
-                  className="text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors duration-500 breathe-ambient"
+                  className="text-xs font-medium text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors duration-500 breathe-ambient"
                   style={{ animationDelay: `${-idx * 2.5}s` }}
                 >
                   Build {kb.year}
@@ -238,12 +245,12 @@ export default function Keyboards() {
               </p>
 
               <div className="mt-auto space-y-4">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--accent)] opacity-40 group-hover:opacity-100 transition-opacity duration-500">Configuration</div>
+                <div className="text-xs font-medium text-[var(--accent)] opacity-60 group-hover:opacity-100 transition-opacity duration-500">Configuration</div>
                 <div className="flex flex-wrap gap-2">
                   {kb.specs.map((spec, specIdx) => (
                     <motion.span
                       key={spec}
-                      className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] px-2 py-1 border border-[var(--border)] group-hover:border-[var(--border-hover)] transition-colors duration-500"
+                      className="text-xs font-medium text-[var(--text-muted)] px-3 py-1 rounded-full border border-[var(--border)] group-hover:border-[var(--border-hover)] transition-colors duration-500"
                       style={{
                         animation: `sway 7s ease-in-out infinite`,
                         animationDelay: `${-specIdx * 1.8}s`,
@@ -261,15 +268,6 @@ export default function Keyboards() {
         ))}
       </div>
 
-      {/* Keyboard hint — only shown on devices with physical keyboard */}
-      {hasKeyboard && (
-        <p
-          className="text-center mt-12 text-xs tracking-[0.3em] text-[var(--text-muted)] opacity-40 italic"
-          style={{ fontFamily: 'var(--font-accent)' }}
-        >
-          try your keyboard...
-        </p>
-      )}
     </section>
   )
 }

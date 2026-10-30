@@ -1,7 +1,10 @@
-import { useRef } from 'react'
+import { useRef, Suspense, lazy } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import WindText from './WindText'
 import KanjiStrokes from './KanjiStrokes'
+import { setTanukiHappy } from './tanukiMood'
+
+const Tanuki = lazy(() => import('./Tanuki'))
 
 // Split subtitle into words for word-by-word breathing
 const SUBTITLE_WORDS = 'Crafting quiet interfaces where every element earns its place, like stones in a garden.'.split(' ')
@@ -102,6 +105,10 @@ export default function Hero() {
           <motion.a
             href="#contact"
             className="btn-secondary"
+            onMouseEnter={() => setTanukiHappy(true)}
+            onMouseLeave={() => setTanukiHappy(false)}
+            onFocus={() => setTanukiHappy(true)}
+            onBlur={() => setTanukiHappy(false)}
             whileHover={{ y: -2 }}
             whileTap={{ y: 1, scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
@@ -110,6 +117,10 @@ export default function Hero() {
           </motion.a>
         </motion.div>
       </motion.div>
+
+      <Suspense fallback={null}>
+        <Tanuki />
+      </Suspense>
     </header>
   )
 }
