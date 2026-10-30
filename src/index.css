@@ -597,6 +597,32 @@ body {
   }
 }
 
+/* Peek page: blinking caret in the demo's message field */
+.peek-caret {
+  margin-left: 1px;
+  animation: peek-caret 1s steps(1) infinite;
+}
+
+@keyframes peek-caret {
+  50% { opacity: 0; }
+}
+
+/* Peek feature cards: lift on hover (pointer devices only), press feedback */
+.peek-card {
+  transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1), border-color 200ms ease, background-color 200ms ease;
+}
+
+.peek-card:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .peek-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-hover);
+  }
+}
+
 /* ============ REDUCED MOTION ============ */
 
 @media (prefers-reduced-motion: reduce) {
