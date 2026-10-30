@@ -13,7 +13,8 @@ import {
    real flows on a mock MacBook screen with a moving cursor:
    music peek → compact → open → assistant chat → file shelf.
 
-   Track, calendar and chat content are made up for the demo.  */
+   Track, calendar and chat content are made up for the demo.
+   Wallpaper and Dock icons are the real macOS ones.           */
 
 // SwiftUI .spring(response:dampingFraction:) → framer-motion physics (mass 1)
 const spring = (response, damping) => ({
@@ -36,6 +37,20 @@ const PANEL_X = (SCREEN_W - PANEL_W) / 2
 const TRACK = { title: 'Rain on Stone', artist: 'Hyruki', duration: 214 }
 const QUESTION = "What's on my calendar today?"
 const REPLY = 'Two things: design review at 10:00 and the gym at 18:30. Want me to move anything?'
+
+const DOCK = [
+  { id: 'finder', running: true },
+  { id: 'safari', running: true },
+  { id: 'messages' },
+  { id: 'mail' },
+  { id: 'music', running: true },
+  { id: 'calendar' },
+  { id: 'notes' },
+  { id: 'photos' },
+  { id: 'settings' },
+  '|',
+  { id: 'peek', running: true },
+]
 
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif'
 
@@ -421,12 +436,10 @@ export default function PeekDemo({ start, onChapter, paused }) {
       style={{
         width: SCREEN_W, height: SCREEN_H, position: 'relative', overflow: 'hidden', fontFamily: SF,
         borderRadius: '18px 18px 0 0', userSelect: 'none',
-        background: 'radial-gradient(120% 90% at 70% 100%, #3b2a4a 0%, #1d1a2b 40%, #0c0c12 100%)',
+        // macOS Sonoma wallpaper (dark variant), cropped to the screen
+        background: '#1b2340 url(/peek-demo/wallpaper.jpg) center / cover no-repeat',
       }}
     >
-      {/* Wallpaper glow */}
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(60% 50% at 25% 85%, rgba(183,55,46,0.35), transparent 70%)' }} />
-
       {/* Menu bar */}
       <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: NOTCH_H, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', fontSize: 12, color: 'rgba(255,255,255,0.85)', background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(12px)' }}>
         <div style={{ display: 'flex', gap: 16 }}>
@@ -585,10 +598,17 @@ export default function PeekDemo({ start, onChapter, paused }) {
         )}
       </AnimatePresence>
 
-      {/* Dock hint */}
-      <div style={{ position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 8, padding: 6, borderRadius: 16, background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(12px)', border: '0.5px solid rgba(255,255,255,0.15)' }}>
-        {['#4fa3ff', '#ff6b5e', '#ffd166', '#7ad37a', '#c58cff', '#5e5e66'].map((c) => (
-          <div key={c} style={{ width: 34, height: 34, borderRadius: 9, background: `linear-gradient(160deg, ${c}, ${c}99)` }} />
+      {/* Dock with real app icons; dots mark running apps */}
+      <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'flex-end', gap: 4, padding: '5px 6px 7px', borderRadius: 18, background: 'rgba(255,255,255,0.16)', backdropFilter: 'blur(18px) saturate(1.4)', border: '0.5px solid rgba(255,255,255,0.22)', boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}>
+        {DOCK.map((app) => (
+          app === '|' ? (
+            <div key="sep" style={{ width: 1, height: 36, margin: '0 4px 4px', background: 'rgba(255,255,255,0.25)' }} />
+          ) : (
+            <div key={app.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <img src={`/peek-demo/${app.id}.png`} alt="" width={40} height={40} draggable={false} style={{ display: 'block', width: 40, height: 40 }} />
+              <div style={{ width: 3, height: 3, borderRadius: 2, background: app.running ? 'rgba(255,255,255,0.85)' : 'transparent' }} />
+            </div>
+          )
         ))}
       </div>
 
