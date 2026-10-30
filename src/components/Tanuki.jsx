@@ -95,7 +95,7 @@ const fragmentShader = `
     return sdEll(q, vec3(0.1, 0.13, 0.05));
   }
 
-  // x: distance, y: material (1 fur, 2 dark fur, 3 stone, 4 eye, 5 tail fur)
+  // x: distance, y: material (1 fur, 2 dark fur, 3 stone, 4 eye, 5.x tail fur, .x = how near the tip)
   vec2 map(vec3 p) {
     // Stone: two rounded masses with lumps, a rock rather than a pillow
     float stone = sdEll(p - vec3(0.05, -0.17, -0.05), vec3(0.95, 0.3, 0.78));
@@ -120,11 +120,14 @@ const fragmentShader = `
     legs = smin(legs, sdEll(bs - vec3(0.36, 0.06, 0.33), vec3(0.13, 0.07, 0.19)), 0.06);
 
     // Bushy tail curling around the side toward the front
+    // One continuous stroke: thick root, full middle, tapering to a soft point
     vec3 tp = b - vec3(0.22, 0.2, -0.46);
     tp.xz = rot(uTail) * tp.xz;
-    float tail = sdCone(tp, vec3(0.0), vec3(0.4, 0.0, -0.18), 0.16, 0.25);
-    tail = smin(tail, sdCone(tp, vec3(0.4, 0.0, -0.18), vec3(0.66, 0.1, 0.14), 0.25, 0.15), 0.14);
-    float tailTip = sdEll(tp - vec3(0.68, 0.11, 0.17), vec3(0.15, 0.14, 0.15));
+    float tail = sdCone(tp, vec3(0.0), vec3(0.38, 0.02, -0.2), 0.16, 0.24);
+    tail = smin(tail, sdCone(tp, vec3(0.38, 0.02, -0.2), vec3(0.62, 0.1, 0.08), 0.24, 0.17), 0.16);
+    tail = smin(tail, sdCone(tp, vec3(0.62, 0.1, 0.08), vec3(0.67, 0.15, 0.27), 0.17, 0.06), 0.12);
+    // 0 at the root → 0.9 at the tip, so the tip darkens gradually
+    float tipness = clamp(1.0 - length(tp - vec3(0.66, 0.14, 0.24)) / 0.34, 0.0, 0.9);
 
     // Head, pivoting at the neck
     vec3 h = b - vec3(0.0, 1.22, 0.08);
@@ -144,10 +147,10 @@ const fragmentShader = `
     // Head blends only slightly so it stays its own shape
     float furD = smin(d, head, 0.07);
     float furAll = smin(furD, tail, 0.14);
-    float darkD = min(min(legs, smin(ears, nose, 0.01)), tailTip);
+    float darkD = min(legs, smin(ears, nose, 0.01));
     float body = smin(furAll, darkD, 0.06);
 
-    vec2 res = vec2(body, darkD < furAll ? 2.0 : (tail < furD ? 5.0 : 1.0));
+    vec2 res = vec2(body, darkD < furAll ? 2.0 : (tail < furD ? 5.0 + tipness : 1.0));
     if (eyes < res.x) res = vec2(eyes, 4.0);
     if (stone < res.x) res = vec2(stone, 3.0);
     return res;
@@ -231,6 +234,7 @@ const fragmentShader = `
     vec3 col;
     if (mat > 4.5 || mat < 2.5) {
       vec3 base = (mat > 1.5 && mat < 2.5) ? vec3(0.022, 0.02, 0.019) : vec3(0.04, 0.036, 0.033);
+      if (mat > 4.5) base = mix(base, vec3(0.022, 0.02, 0.019), fract(mat));  // darker toward the tail tip
       col = base * (0.75 + 0.5 * dif) + MOON * rim * 0.55;
       // Fringe strands backlit by the moon glow on its side, stay dark elsewhere
       if (!hit) col = base + MOON * toward * 0.8;
