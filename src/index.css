@@ -563,8 +563,10 @@ body {
 .tanuki-heart {
   position: absolute;
   top: 13%;
-  width: 6.5%;
-  fill: var(--accent);
+  width: 5.5%;
+  /* Moonlit off-white like the moon and the joy lines, with a soft glow */
+  fill: var(--text);
+  filter: drop-shadow(0 0 5px rgba(237, 232, 223, 0.45));
   pointer-events: none;
   opacity: 0;
   transform-origin: 50% 80%;
