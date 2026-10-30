@@ -76,7 +76,7 @@ function TitleEyes({ happy }) {
   )
 }
 
-/* Scales the fixed-size 820px demo down to fit narrow screens */
+/* Scales the fixed-size demo screen down to fit the column */
 function FitToWidth({ width, height, children }) {
   const ref = useRef(null)
   const [scale, setScale] = useState(1)
@@ -175,12 +175,12 @@ export default function PeekPage() {
           {/* Glow behind the screen */}
           <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-10 -translate-x-1/2 w-[90%] h-[70%] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(183,55,46,0.22), rgba(94,158,255,0.06) 60%, transparent)', filter: 'blur(30px)' }} />
           <div ref={demoRef} className="relative">
-            <FitToWidth width={844} height={466}>
+            <FitToWidth width={1304} height={858}>
               {/* Laptop lid: bezel around the screen, hinge below */}
-              <div style={{ width: 844, padding: '12px 12px 0', borderRadius: '24px 24px 0 0', background: '#0b0b0d', boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 40px 80px -20px rgba(0,0,0,0.7)' }}>
+              <div style={{ width: 1304, padding: '12px 12px 0', borderRadius: '28px 28px 0 0', background: '#0b0b0d', boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 40px 80px -20px rgba(0,0,0,0.7)' }}>
                 <PeekDemo start={start} onChapter={setCurrent} paused={paused} />
               </div>
-              <div style={{ width: 900, height: 14, marginLeft: -28, borderRadius: '0 0 12px 12px', background: 'linear-gradient(#2a2a2e, #141416)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }} />
+              <div style={{ width: 1360, height: 14, marginLeft: -28, borderRadius: '0 0 12px 12px', background: 'linear-gradient(#2a2a2e, #141416)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }} />
             </FitToWidth>
           </div>
 

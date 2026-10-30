@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   House, Sparkles, FileText, Play, Pause, SkipBack, SkipForward,
-  FileArchive, Image as ImageIcon, Radio, XCircle, ArrowUp,
+  FileArchive, Image as ImageIcon, Radio, XCircle, ArrowUp, Wifi, BatteryFull, SlidersHorizontal,
 } from 'lucide-react'
 
 /* ── PeekDemo ───────────────────────────────────────────────
@@ -24,9 +24,10 @@ const spring = (response, damping) => ({
   mass: 1,
 })
 
-// Sizes from NotchViewModel / NotchView
-const SCREEN_W = 820
-const SCREEN_H = 430
+// Screen at real MacBook Air 13" points, so the notch keeps true proportions;
+// the page scales the whole screen down to fit. Sizes below from NotchViewModel / NotchView.
+const SCREEN_W = 1280
+const SCREEN_H = 832
 const NOTCH_W = 200
 const NOTCH_H = 32
 const PANEL_W = 610           // notchWidth * 3.05
@@ -38,19 +39,29 @@ const TRACK = { title: 'Rain on Stone', artist: 'Hyruki', duration: 214 }
 const QUESTION = "What's on my calendar today?"
 const REPLY = 'Two things: design review at 10:00 and the gym at 18:30. Want me to move anything?'
 
+// Peek itself runs without a Dock icon (LSUIElement), so it isn't here
 const DOCK = [
   { id: 'finder', running: true },
   { id: 'safari', running: true },
-  { id: 'messages' },
-  { id: 'mail' },
   { id: 'music', running: true },
+  { id: 'messages' },
   { id: 'calendar' },
-  { id: 'notes' },
-  { id: 'photos' },
-  { id: 'settings' },
   '|',
-  { id: 'peek', running: true },
+  { id: 'folder' },
+  { id: 'trash' },
 ]
+
+// Desktop icons, top-right column like Finder lays them out
+const DESKTOP = [
+  { id: 'moodboard', label: 'moodboard.png', img: 'moodboard.jpg', thumb: true },
+  { id: 'peek', label: 'peek', img: 'folder.png' },
+  { id: 'urbanradar', label: 'urbanradar', img: 'folder.png' },
+]
+const DESK_X = SCREEN_W - 92
+const DESK_Y = (i) => 52 + i * 112
+
+// The Apple glyph only exists in Apple's system fonts; show it there only
+const IS_APPLE = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)
 
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif'
 
@@ -249,9 +260,14 @@ function FileThumb({ kind }) {
       transition={spring(0.35, 0.65)}
       style={{ width: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}
     >
-      <div style={{ width: 52, height: 52, borderRadius: 10, background: 'rgba(255,255,255,0.06)', display: 'grid', placeItems: 'center', color: 'rgba(255,255,255,0.7)' }}>
-        <Icon size={26} strokeWidth={1.5} />
-      </div>
+      {kind === 'img' ? (
+        // Same file that was dragged off the desktop
+        <img src="/peek-demo/moodboard.jpg" alt="" draggable={false} style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 10 }} />
+      ) : (
+        <div style={{ width: 52, height: 52, borderRadius: 10, background: 'rgba(255,255,255,0.06)', display: 'grid', placeItems: 'center', color: 'rgba(255,255,255,0.7)' }}>
+          <Icon size={26} strokeWidth={1.5} />
+        </div>
+      )}
       <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.6)' }}>{kind === 'img' ? 'moodboard.png' : 'brief.zip'}</span>
     </motion.div>
   )
@@ -325,7 +341,7 @@ function Cursor({ x, y, grab }) {
 
 /* ── Timeline ────────────────────────────────────────────── */
 
-const REST = { x: 610, y: 300 }
+const REST = { x: 900, y: 560 }
 const NOTCH_HOVER = { x: SCREEN_W / 2 + 30, y: 14 }
 const AI_TAB = { x: PANEL_X + 12 + 4 + 28 + 6 + 10, y: 21 }
 const HOME_TAB = { x: PANEL_X + 12 + 4 + 10, y: 21 }
@@ -398,8 +414,9 @@ export default function PeekDemo({ start, onChapter, paused }) {
       },
       shelf: () => {
         at(0, () => onChapter?.('shelf'))
-        at(200, () => set({ expanded: false, files: 0, cursor: { x: 690, y: 330 }, fileFly: { x: 676, y: 300 } }))
-        at(800, () => set({ grab: true }))
+        at(200, () => set({ expanded: false, files: 0, cursor: { x: DESK_X + 30, y: DESK_Y(0) + 34 } }))
+        at(700, () => set({ fileFly: { x: DESK_X, y: DESK_Y(0) } }))
+        at(100, () => set({ grab: true }))
         at(250, () => set({ cursor: { x: SCREEN_W / 2 + 6, y: 40 }, fileFly: { x: SCREEN_W / 2 - 10, y: 12 }, dragHover: true }))
         at(900, () => set({ expanded: true, tab: 'shelf' }))       // drag over notch → panel with drop zone
         at(1100, () => set({ grab: false, fileFly: null, dragHover: false, files: 1 }))
@@ -440,15 +457,32 @@ export default function PeekDemo({ start, onChapter, paused }) {
         background: '#1b2340 url(/peek-demo/wallpaper.jpg) center / cover no-repeat',
       }}
     >
-      {/* Menu bar */}
-      <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: NOTCH_H, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', fontSize: 12, color: 'rgba(255,255,255,0.85)', background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(12px)' }}>
-        <div style={{ display: 'flex', gap: 16 }}>
-          <span style={{ fontWeight: 700 }}>Finder</span><span>File</span><span>Edit</span><span>View</span>
+      {/* Menu bar (transparent, like macOS with a notch) */}
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: NOTCH_H, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 18px', fontSize: 13, color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.35)' }}>
+        <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
+          {IS_APPLE && <span style={{ fontSize: 15 }}>{'\uF8FF'}</span>}
+          <span style={{ fontWeight: 700 }}>Finder</span>
+          {['File', 'Edit', 'View', 'Go', 'Window', 'Help'].map((m) => <span key={m}>{m}</span>)}
         </div>
-        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-          <Radio size={12} /><span>{new Date().toLocaleString('en', { weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false })}</span>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          <Wifi size={15} strokeWidth={2.2} />
+          <BatteryFull size={20} strokeWidth={1.8} />
+          <SlidersHorizontal size={14} strokeWidth={2.2} />
+          <span>{new Date().toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).replace(',', '')}&nbsp;&nbsp;{new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
       </div>
+
+      {/* Desktop icons */}
+      {DESKTOP.map((d, i) => (
+        <div key={d.id} style={{ position: 'absolute', left: DESK_X - 20, top: DESK_Y(i), width: 104, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, opacity: d.id === 'moodboard' && s.fileFly ? 0.45 : 1, transition: 'opacity 200ms ease' }}>
+          {d.thumb ? (
+            <img src={`/peek-demo/${d.img}`} alt="" draggable={false} style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 3, border: '2px solid #fff', boxShadow: '0 2px 6px rgba(0,0,0,0.35)', margin: '12px 0 8px' }} />
+          ) : (
+            <img src={`/peek-demo/${d.img}`} alt="" draggable={false} style={{ width: 64, height: 64 }} />
+          )}
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}>{d.label}</span>
+        </div>
+      ))}
 
       {/* Collapsed island */}
       <motion.div
@@ -590,23 +624,21 @@ export default function PeekDemo({ start, onChapter, paused }) {
             transition={{ type: 'spring', stiffness: 120, damping: 20, mass: 0.8 }}
             style={{ position: 'absolute', left: 0, top: 0, zIndex: 25, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
           >
-            <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(255,255,255,0.9)', display: 'grid', placeItems: 'center', color: '#444', boxShadow: '0 6px 16px rgba(0,0,0,0.4)' }}>
-              <ImageIcon size={20} />
-            </div>
-            <span style={{ fontSize: 10, color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.7)' }}>moodboard.png</span>
+            <img src="/peek-demo/moodboard.jpg" alt="" draggable={false} style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 3, border: '2px solid #fff', boxShadow: '0 8px 20px rgba(0,0,0,0.45)', margin: '12px 0 8px', opacity: 0.85 }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,0.6)', opacity: 0.85 }}>moodboard.png</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Dock with real app icons; dots mark running apps */}
-      <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'flex-end', gap: 4, padding: '5px 6px 7px', borderRadius: 18, background: 'rgba(255,255,255,0.16)', backdropFilter: 'blur(18px) saturate(1.4)', border: '0.5px solid rgba(255,255,255,0.22)', boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}>
+      {/* Dock: dark glass, real icons, dots under running apps */}
+      <div style={{ position: 'absolute', bottom: 6, left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'flex-end', gap: 8, padding: '7px 10px 5px', borderRadius: 24, background: 'rgba(28,28,30,0.5)', backdropFilter: 'blur(24px) saturate(1.5)', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}>
         {DOCK.map((app) => (
           app === '|' ? (
-            <div key="sep" style={{ width: 1, height: 36, margin: '0 4px 4px', background: 'rgba(255,255,255,0.25)' }} />
+            <div key="sep" style={{ width: 1, height: 52, margin: '0 4px 9px', background: 'rgba(255,255,255,0.22)' }} />
           ) : (
-            <div key={app.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <img src={`/peek-demo/${app.id}.png`} alt="" width={40} height={40} draggable={false} style={{ display: 'block', width: 40, height: 40 }} />
-              <div style={{ width: 3, height: 3, borderRadius: 2, background: app.running ? 'rgba(255,255,255,0.85)' : 'transparent' }} />
+            <div key={app.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+              <img src={`/peek-demo/${app.id}.png`} alt="" width={56} height={56} draggable={false} style={{ display: 'block', width: 56, height: 56 }} />
+              <div style={{ width: 4, height: 4, borderRadius: 2, background: app.running ? 'rgba(255,255,255,0.8)' : 'transparent' }} />
             </div>
           )
         ))}
