@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Download, Github, Copy, Check, Music, CalendarDays, FolderDown, Hand, Sparkles, Bluetooth } from 'lucide-react'
+import { ArrowLeft, Download, Github, Copy, Check, Play } from 'lucide-react'
 import PeekDemo, { CHAPTERS } from './PeekDemo'
 
 /* ── Peek page (hyruki.cc/peek) ─────────────────────────────
@@ -13,12 +13,12 @@ const DOWNLOAD = `${REPO}/releases/latest/download/Peek.zip`
 const UNQUARANTINE = 'xattr -dr com.apple.quarantine /Applications/Peek.app'
 
 const features = [
-  { icon: Music, title: 'Now playing', chapter: 'music', desc: 'Artwork, controls and a live waveform. Works with any app that plays audio, or connects straight to Spotify or Apple Music.' },
-  { icon: CalendarDays, title: 'Calendar', chapter: 'open', desc: 'Upcoming events from the calendars you pick, a hover away.' },
-  { icon: FolderDown, title: 'File shelf', chapter: 'shelf', desc: 'Drop files on the notch to keep them handy, then drag them out again or AirDrop them.' },
-  { icon: Sparkles, title: 'Assistant', chapter: 'assistant', desc: 'Optional. Chat from the notch with push-to-talk, using a small model on your Mac or any OpenAI-compatible provider.' },
-  { icon: Hand, title: 'Gestures', desc: 'Click the notch to open it. Swipe left or right to skip tracks, up or down to open or close.' },
-  { icon: Bluetooth, title: 'Vessel', desc: 'Experimental. A Bluetooth desk companion the assistant can travel to, with a simulation mode to try it without hardware.' },
+  { title: 'Now playing', chapter: 'music', desc: 'Artwork, controls and a live waveform. Works with any app that plays audio, or connects straight to Spotify or Apple Music.' },
+  { title: 'Calendar', chapter: 'open', desc: 'Upcoming events from the calendars you pick, a hover away.' },
+  { title: 'File shelf', chapter: 'shelf', desc: 'Drop files on the notch to keep them handy, then drag them out again or AirDrop them.' },
+  { title: 'Assistant', chapter: 'assistant', desc: 'Optional. Chat from the notch with push-to-talk, using a small model on your Mac or any OpenAI-compatible provider.' },
+  { title: 'Gestures', desc: 'Click the notch to open it. Swipe left or right to skip tracks, up or down to open or close.' },
+  { title: 'Vessel', desc: 'Experimental. A Bluetooth desk companion the assistant can travel to, with a simulation mode to try it without hardware.' },
 ]
 
 const ease = [0.22, 1, 0.36, 1]
@@ -206,42 +206,47 @@ export default function PeekPage() {
           </div>
         </motion.section>
 
-        {/* Features */}
+        {/* Features: a plain list, like liner notes. Rows with a scene play it in the demo */}
         <section className="py-16 border-t border-[var(--border)]">
-          <p className="eyebrow mb-10"><span lang="ja">作</span>What it does</p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <p className="eyebrow mb-6">What it does</p>
+          <ul>
             {features.map((f, i) => {
-              const Icon = f.icon
               const Tag = f.chapter ? 'button' : 'div'
               return (
-                <motion.div
+                <motion.li
                   key={f.title}
-                  initial={{ opacity: 0, y: 14 }}
+                  initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ duration: 0.6, delay: i * 0.05, ease }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.6, delay: i * 0.04, ease }}
+                  className="border-b border-[var(--border)]"
                 >
                   <Tag
                     type={f.chapter ? 'button' : undefined}
                     onClick={f.chapter ? () => jump(f.chapter, true) : undefined}
-                    className={`peek-card group w-full h-full text-left rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 ${f.chapter ? 'cursor-pointer' : ''}`}
+                    className={`feature-row group w-full text-left grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-x-10 gap-y-2 py-7 ${f.chapter ? 'cursor-pointer' : ''}`}
                   >
-                    <div className="mb-4 inline-grid place-items-center w-10 h-10 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)]">
-                      <Icon size={18} />
+                    <h2 className="heading-accent text-3xl sm:text-4xl leading-tight text-[var(--text)] transition-transform duration-300 md:group-hover:translate-x-1.5">
+                      {f.title}
+                    </h2>
+                    <div className="md:pt-2">
+                      <p className="text-[var(--text-body)] leading-relaxed">{f.desc}</p>
+                      {f.chapter && (
+                        <span className="mt-3 inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors duration-200">
+                          <Play size={12} /> Play it in the demo
+                        </span>
+                      )}
                     </div>
-                    <h2 className="text-lg font-semibold text-[var(--text)] mb-2">{f.title}</h2>
-                    <p className="text-[var(--text-body)] leading-relaxed text-[15px]">{f.desc}</p>
-                    {f.chapter && <span className="mt-4 inline-block text-sm text-[var(--text-muted)] group-hover:text-[var(--text)] transition-colors duration-200">See it ↑</span>}
                   </Tag>
-                </motion.div>
+                </motion.li>
               )
             })}
-          </div>
+          </ul>
         </section>
 
         {/* Install */}
         <section className="py-16 border-t border-[var(--border)]">
-          <p className="eyebrow mb-10"><span lang="ja">鍵</span>Install</p>
+          <p className="eyebrow mb-10">Install</p>
           <ol className="space-y-5 text-[var(--text-body)] leading-relaxed max-w-2xl">
             <li className="flex gap-4"><span className="font-mono text-[var(--accent)]">1</span><span>Download <a href={DOWNLOAD} className="text-[var(--text)] underline underline-offset-4 decoration-[var(--border-hover)] hover:decoration-[var(--text)]">Peek.zip</a> and unzip it.</span></li>
             <li className="flex gap-4"><span className="font-mono text-[var(--accent)]">2</span><span>Move <strong className="font-semibold text-[var(--text)]">Peek.app</strong> to your Applications folder and open it.</span></li>

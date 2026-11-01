@@ -101,7 +101,7 @@ export default function About() {
     >
       <motion.div style={{ y, opacity }}>
         <div className="max-w-3xl">
-          <p className="eyebrow mb-6"><span lang="ja">庭</span>Philosophy</p>
+          <p className="eyebrow mb-6">Philosophy</p>
           <WindText className="text-5xl sm:text-7xl heading-accent mb-14">
             The Garden
           </WindText>

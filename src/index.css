@@ -625,6 +625,150 @@ body {
   }
 }
 
+/* ============ FIDGET KNOB ============ */
+
+/* Smooth teal shell, shown straight-on. */
+.knob-scene {
+  width: min(380px, 78vw);
+  aspect-ratio: 1;
+}
+
+.knob-body {
+  width: 100%;
+  height: 100%;
+}
+
+.knob-puck {
+  background: #103f3c;
+  box-shadow:
+    0 6px 12px -6px rgba(0, 0, 0, 0.35),
+    0 24px 34px -16px rgba(0, 0, 0, 0.6);
+}
+
+.knob-puck:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 9px;
+}
+
+.knob-face {
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 28% 14%, rgba(138, 182, 161, 0.14), transparent 53%),
+    radial-gradient(circle at 45% 42%, #15534c 58%, #124941 78%, #0b3532 97%);
+  box-shadow:
+    inset 2px 3px 5px rgba(172, 202, 179, 0.13),
+    inset -3px -6px 8px rgba(3, 24, 25, 0.45);
+}
+
+.knob-screen {
+  inset: 12.5%;
+  background: #080b12;
+  box-shadow:
+    0 0 0 2px #092b2a,
+    0 -2px 4px 2px rgba(2, 20, 22, 0.55),
+    0 2px 1px 1px rgba(113, 157, 137, 0.18);
+}
+
+.knob-glass {
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(132, 158, 189, 0.035), transparent 55%);
+  box-shadow: inset 0 0 0 1px #080d14, inset 0 0 9px rgba(1, 8, 12, 0.45);
+}
+
+/* Keep the whole device and its controls in the same view. */
+.fidget-demo {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.fidget-model-stage {
+  min-width: 0;
+  width: 100%;
+  padding: 16px 0 48px;
+}
+
+.fidget-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 400px;
+  min-width: 0;
+}
+
+.fidget-mode-options,
+.fidget-look-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fidget-picker {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: var(--text-body);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.fidget-select-wrap { position: relative; display: block; }
+
+.fidget-select-wrap select {
+  width: 100%;
+  min-height: 44px;
+  appearance: none;
+  border: 1px solid var(--border-hover);
+  border-radius: 5px;
+  padding: 10px 22px 10px 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.fidget-select-wrap svg {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.fidget-select-wrap select:hover { border-color: var(--text-muted); }
+.fidget-select-wrap select:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+
+.fidget-choice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 8px;
+  border: 1px solid var(--border-hover);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: background-color 140ms ease-out, border-color 140ms ease-out;
+}
+
+.fidget-choice:hover { background: var(--bg-card-hover); border-color: var(--text-muted); }
+.fidget-choice[aria-pressed="true"] { color: var(--bg); background: var(--text); border-color: var(--text); }
+.fidget-choice:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+
+@media (min-width: 900px) {
+  .fidget-demo {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 40px;
+  }
+}
+
 /* ============ REDUCED MOTION ============ */
 
 @media (prefers-reduced-motion: reduce) {

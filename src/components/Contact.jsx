@@ -74,7 +74,7 @@ export default function Contact() {
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="text-center mb-20">
-          <p className="eyebrow mb-6 justify-center"><span lang="ja">話</span>Connection</p>
+          <p className="eyebrow mb-6 justify-center">Connection</p>
           <WindText className="text-5xl sm:text-7xl heading-accent mb-8">
             Begin a Dialogue
           </WindText>
